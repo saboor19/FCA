@@ -6,32 +6,65 @@
   --color-foreground: var(--foreground);
   --color-card: var(--card);
   --color-border-custom: var(--border);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-secondary: var(--secondary);
+  --color-accent: var(--accent);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-destructive: var(--destructive);
 }
 
-/* 2. Define the actual colors for light mode */
+/* 2. Light mode – clean, high contrast, inviting */
 :root {
-  --background: #ffffff;
-  --foreground: #0f172a;
-  --card: #f8fafc;
-  --border: #e2e8f0;
+  --background: #f8fafc;      /* Slate-50 – soft, less harsh than white */
+  --foreground: #0f172a;      /* Slate-900 – deep, readable */
+  --card: #ffffff;            /* Pure white for card clarity */
+  --border: #e2e8f0;          /* Slate-200 – subtle border */
+  --primary: #4f46e5;         /* Indigo-600 – trustworthy, energetic */
+  --primary-hover: #4338ca;   /* Indigo-700 */
+  --secondary: #334155;       /* Slate-700 – for less prominent buttons */
+  --accent: #f59e0b;          /* Amber-500 – warm highlight (CTAs) */
+  --muted: #f1f5f9;           /* Slate-100 – for subtle backgrounds */
+  --muted-foreground: #64748b;/* Slate-500 – for secondary text */
+  --destructive: #ef4444;     /* Red-500 – errors/deletions */
 }
 
-/* 3. Define the colors for dark mode */
+/* 3. Dark mode – deep, calm, reduced eye strain */
 .dark {
-  --background: #0f172a;
-  --foreground: #ffffff;
-  --card: #18181b;
-  --border: #27272a;
+  --background: #0a0f1c;      /* Darker, richer slate base */
+  --foreground: #f1f5f9;      /* Slate-100 – off‑white for readability */
+  --card: #111827;            /* Gray-900 – slightly lifted */
+  --border: #1f2937;          /* Gray-800 – subtle definition */
+  --primary: #6366f1;         /* Indigo-500 – bright but not overwhelming */
+  --primary-hover: #818cf8;   /* Indigo-400 */
+  --secondary: #475569;       /* Slate-600 */
+  --accent: #fbbf24;          /* Amber-400 – vibrant but not neon */
+  --muted: #1e293b;           /* Slate-800 */
+  --muted-foreground: #94a3b8;/* Slate-400 */
+  --destructive: #f87171;     /* Red-400 */
 }
 
-/* * {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-} */
-
+/* 4. Smooth theme transitions */
 body {
   background: var(--background);
   color: var(--foreground);
-  transition: background 0.3s ease, color 0.3s ease;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+/* 5. Optional: style scrollbar for consistency (improves polish) */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--muted);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--secondary);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary);
 }

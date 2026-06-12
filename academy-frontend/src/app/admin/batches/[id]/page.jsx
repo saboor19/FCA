@@ -197,24 +197,13 @@ const toggleAllTeachers = () => {
 
             <div className="flex items-center gap-3">
               {batch?.teacherAssignments?.length > 0 && (
-                <button
-                  onClick={toggleAllTeachers}
-                  className="flex items-center gap-2 text-slate-600 dark:text-slate-300 bg-card border border-border-custom px-4 py-2 rounded-xl text-sm hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
-                >
-                  {selectedTeachers.length === batch.teachers.length ? <Square size={16} /> : <CheckSquare size={16} />}
-                  {selectedTeachers.length === batch.teachers.length ? "Deselect All" : "Select All"}
-                </button>
-              )}
-
-              {selectedTeachers.length > 0 && (
-                <button
-                  onClick={handleRemoveTeachers}
-                  disabled={isRemovingTeachers}
-                  className="flex items-center gap-2 bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-500/20 border border-red-200 dark:border-red-500/20 px-4 py-2 rounded-xl text-sm transition-colors"
-                >
-                  <Trash2 size={16} />
-                  {isRemovingTeachers ? "Removing..." : `Remove (${selectedTeachers.length})`}
-                </button>
+<button
+  onClick={toggleAllTeachers}
+  className="flex items-center gap-2 text-slate-600 dark:text-slate-300 bg-card border border-border-custom px-4 py-2 rounded-xl text-sm hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
+>
+  {selectedTeachers.length === batch?.teacherAssignments?.length ? <Square size={16} /> : <CheckSquare size={16} />}
+  {selectedTeachers.length === batch?.teacherAssignments?.length ? "Deselect All" : "Select All"}
+</button>
               )}
 
               <button
