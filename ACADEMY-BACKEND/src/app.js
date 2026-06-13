@@ -8,7 +8,7 @@ const rateLimit = require("express-rate-limit");
 // const testRoutes= require("./routes/testRoutes")
 
 
-//------------ROUTE IMPORTS----------------
+//------------ protected ROUTE IMPORTS----------------
 const authRoutes = require("./routes/authRoutes");
 const courseRoutes = require("./routes/admin/courseRoutes");
 const studentRoutes = require("./routes/admin/studentRoutes");
@@ -20,6 +20,11 @@ const noticeRoutes = require("./routes/admin/noticeRoutes")
 const teacherRoutes = require("./routes/teacher/batchRoutes")
 const feeRoutes = require("./routes/admin/feeRoutes");
 const financeRoutes=require("./routes/admin/financeRoutes")
+
+//-----------------public route imports------------------
+const publicCourseRoutes = require("./routes/courseRoutes");
+
+
 //------------ERROR HANDLER---------
 const errorHandler = require("./middlewares/errorMiddleware");
 
@@ -55,10 +60,12 @@ app.get("/", (req, res) => {res.json({message: "Academy API Running" });});
 app.use("/api/auth", authRoutes);
 
 
-//---------------COURSE ROUTES
-app.use("/api/admin/courses", courseRoutes);
+//---------------public routes----------------
+app.use("/api/courses", publicCourseRoutes);
+
 
 //---------------- admin routes
+app.use("/api/admin/courses", courseRoutes);
 app.use( "/api/admin/students", studentRoutes );
 app.use( "/api/batches",batchRoutes );
 app.use("/api/enrollments",enrollmentRoutes);

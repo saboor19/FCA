@@ -2,7 +2,7 @@
 
 import { usePathname } from "next/navigation";
 
-import Navbar from "@/components/navbar";
+import Navbar from "@/components/public/navbar";
 
 const dashboardPrefixes = [
   "/admin",

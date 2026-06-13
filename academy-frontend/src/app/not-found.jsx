@@ -14,7 +14,7 @@ import DashboardLayout from "@/components/dashboard/DashboardLayout";
 
 export default function NotFoundPage() {
   return (
-    <DashboardLayout role="ADMIN">
+    
       <div className="flex flex-col items-center justify-center min-h-[70vh] px-4">
         
         {/* Animated Icon Composition */}
@@ -89,6 +89,6 @@ export default function NotFoundPage() {
         {/* Decorative background element (matches Academy design system) */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -z-10 w-64 h-64 bg-blue-50 rounded-full blur-3xl opacity-50" />
       </div>
-    </DashboardLayout>
+
   );
 }
