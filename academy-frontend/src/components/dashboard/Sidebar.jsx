@@ -48,7 +48,7 @@ const icons = {
 
 const Sidebar = ({ role }) => {
   const pathname = usePathname();
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(true);
   const [expandedMenus, setExpandedMenus] = useState({});
 
   const toggleMenu = (name) => {
@@ -133,7 +133,7 @@ const Sidebar = ({ role }) => {
       {/* Collapse toggle – always visible */}
       <button
         onClick={() => setIsCollapsed(!isCollapsed)}
-        className="absolute -right-3 top-9 bg-card border border-border-custom rounded-full p-2 shadow-md hover:shadow-lg text-muted-foreground hover:text-foreground transition-all hover:scale-110 z-50"
+        className="absolute w-6 -right-6 z-[-1] top-[50%] bg-card border-y border-r border-border-custom rounded-r-2xl h-20 p-2 shadow-md hover:shadow-lg text-muted-foreground hover:text-foreground transition-all hover:scale-110 "
         aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
       >
         {isCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
@@ -150,13 +150,12 @@ const Sidebar = ({ role }) => {
         </div>
         {(!isCollapsed || (isCollapsed && window?.innerWidth >= 1024)) && (
           <div className="hidden lg:block">
-            {/* <h1 className="text-xl font-medium tracking-[-0.04em] text-foreground">
-              Fusion Code
-            </h1> */}
-            <p className="text-[10px] tracking-[1.5px] text-muted-foreground -mt-1">
-              ACADEMY
+          {!isCollapsed && (
+            <span className="capitalize">{role?.toLowerCase()} panel</span>
+          )}
+          <p className="text-[10px] tracking-[1.5px] text-muted-foreground -mt-1">
+              FUSION CODE ACADEMY
             </p>
-            <p>{role}</p>
           </div>
         )}
         {/* On mobile always show brand when expanded */}
@@ -268,17 +267,7 @@ const Sidebar = ({ role }) => {
       </nav>
 
       {/* Footer */}
-      <div
-        className={`mt-auto border-t border-border-custom p-4 ${
-          isCollapsed ? "lg:px-3 lg:flex lg:justify-center" : ""
-        }`}
-      >
-        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-          {!isCollapsed && (
-            <span className="capitalize">{role?.toLowerCase()} panel</span>
-          )}
-        </div>
-      </div>
+      
     </aside>
   );
 };

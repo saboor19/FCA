@@ -57,7 +57,7 @@ export default function CreateTeacherPage() {
   return (
     <DashboardLayout role="ADMIN">
       {/* HEADER */}
-      <div className="flex items-center justify-between mb-8 max-w-4xl">
+      <div className="flex items-center justify-between mb-8 w-full">
         <div>
           <h1 className="text-2xl font-bold text-foreground">
             Create Teacher
@@ -79,7 +79,7 @@ export default function CreateTeacherPage() {
       {/* FORM */}
       <form
         onSubmit={handleSubmit}
-        className="bg-card border border-border-custom rounded-2xl shadow-sm overflow-hidden p-6 md:p-8 space-y-6 max-w-4xl"
+        className="bg-card border border-border-custom rounded-2xl shadow-sm overflow-hidden p-6 md:p-8 space-y-6 w-full"
       >
         {/* BASIC INFO */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

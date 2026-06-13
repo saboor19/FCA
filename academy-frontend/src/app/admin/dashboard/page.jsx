@@ -27,7 +27,7 @@ import { getEnrollments } from "@/services/admin/enrollmentService";
 import { getNotices } from "@/services/admin/noticeService";
 import { getFinanceOverview } from "@/services/admin/financeService";
 import { getAllFees } from "@/services/admin/feeService";
-
+import SlidingHeadlines from "@/components/dashboard/SlidingHeadlines";
 const AdminDashboard = () => {
   // State for all dashboard data
   const [loading, setLoading] = useState(true);
@@ -237,6 +237,7 @@ const AdminDashboard = () => {
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchDashboardData();
   }, [fetchDashboardData]);
 
@@ -339,6 +340,7 @@ const AdminDashboard = () => {
           <span>{error}</span>
         </div>
       )}
+      <SlidingHeadlines />
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
