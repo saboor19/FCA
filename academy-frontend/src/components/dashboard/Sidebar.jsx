@@ -3,44 +3,84 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { 
-  LayoutDashboard, BookOpen, Users, CalendarDays, FileText, 
-  Wallet, Bell, ShieldCheck, GraduationCap, ChevronLeft, ChevronRight,
-  Award, TrendingUp
+import { Inter } from "next/font/google";
+import {
+  LayoutDashboard,
+  BookOpen,
+  Users,
+  CalendarDays,
+  FileText,
+  Wallet,
+  Bell,
+  ShieldCheck,
+  GraduationCap,
+  ChevronLeft,
+  ChevronRight,
+  Award,
+  TrendingUp,
+  Plus,
+  ChevronDown,
 } from "lucide-react";
+
+const inter = Inter({
+  subsets: ["latin"],
+  weight: ["300", "400", "500"],
+  display: "swap",
+});
+
+const icons = {
+  Dashboard: LayoutDashboard,
+  Courses: BookOpen,
+  "My Courses": BookOpen,
+  Students: Users,
+  Teachers: Users,
+  Attendance: CalendarDays,
+  Assignments: FileText,
+  Fees: Wallet,
+  Notices: Bell,
+  Batches: GraduationCap,
+  Enrollments: ShieldCheck,
+  Profile: Users,
+  Reports: FileText,
+  Performance: TrendingUp,
+  Achievements: Award,
+};
 
 const Sidebar = ({ role }) => {
   const pathname = usePathname();
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [expandedMenus, setExpandedMenus] = useState({});
 
-  const getIcon = (name) => {
-    const icons = {
-      Dashboard: <LayoutDashboard size={20} />,
-      Courses: <BookOpen size={20} />,
-      "My Courses": <BookOpen size={20} />,
-      Students: <Users size={20} />,
-      Teachers: <Users size={20} />,
-      Attendance: <CalendarDays size={20} />,
-      Assignments: <FileText size={20} />,
-      Fees: <Wallet size={20} />,
-      Notices: <Bell size={20} />,
-      Batches: <GraduationCap size={20} />,
-      Enrollments: <ShieldCheck size={20} />,
-      Profile: <Users size={20} />,
-      Reports: <FileText size={20} />,
-      "Performance": <TrendingUp size={20} />,
-      "Achievements": <Award size={20} />,
-    };
-    return icons[name] || <LayoutDashboard size={20} />;
+  const toggleMenu = (name) => {
+    setExpandedMenus((prev) => ({
+      ...prev,
+      [name]: !prev[name],
+    }));
   };
 
   const links = {
     ADMIN: [
       { name: "Dashboard", href: "/admin/dashboard" },
-      { name: "Students", href: "/admin/students" },
-      { name: "Teachers", href: "/admin/teachers" },
-      { name: "Courses", href: "/admin/courses" },
-      { name: "Batches", href: "/admin/batches" },
+      {
+        name: "Students",
+        href: "/admin/students",
+        subItems: [{ name: "Create New", href: "/admin/students/create" }],
+      },
+      {
+        name: "Teachers",
+        href: "/admin/teachers",
+        subItems: [{ name: "Create New", href: "/admin/teachers/create" }],
+      },
+      {
+        name: "Courses",
+        href: "/admin/courses",
+        subItems: [{ name: "Create New", href: "/admin/courses/create" }],
+      },
+      {
+        name: "Batches",
+        href: "/admin/batches",
+        subItems: [{ name: "Create New", href: "/admin/batches/new" }],
+      },
       { name: "Enrollments", href: "/admin/enrollments" },
       { name: "Fees", href: "/admin/fees" },
       { name: "TimeTables", href: "/admin/timetables" },
@@ -73,34 +113,61 @@ const Sidebar = ({ role }) => {
   const activeLinks = links[role] || links.ADMIN;
 
   return (
-    <aside 
+    <aside
       className={`
-        ${isCollapsed ? "w-20" : "w-72"} 
-        border-r border-border-custom bg-card/95 backdrop-blur-xl 
-        h-screen flex flex-col transition-all duration-500 ease-out 
-        sticky top-0 shrink-0 z-30 shadow-xl
+        ${inter.className} 
+        /* --- Mobile: fixed overlay, slides in/out --- */
+        fixed top-0 left-0 h-full z-40 w-72
+        bg-card/95 backdrop-blur-xl
+        border-r border-border-custom
+        shadow-2xl
+        transition-all duration-500 ease-out
+        ${isCollapsed ? "-translate-x-full" : "translate-x-0"}
+
+        /* --- Desktop: sticky, shrinks content --- */
+        lg:sticky lg:top-0 lg:h-screen lg:z-30
+        lg:translate-x-0                     /* always visible on desktop */
+        ${isCollapsed ? "lg:w-30" : "lg:w-72"}
       `}
     >
-      {/* Collapse Toggle Button - Improved */}
-      <button 
+      {/* Collapse toggle – always visible */}
+      <button
         onClick={() => setIsCollapsed(!isCollapsed)}
-        className="absolute -right-3 top-9 bg-card border border-border-custom rounded-full p-2 shadow-md hover:shadow-lg text-slate-500 dark:text-slate-400 hover:text-foreground transition-all hover:scale-110 z-40"
+        className="absolute -right-3 top-9 bg-card border border-border-custom rounded-full p-2 shadow-md hover:shadow-lg text-muted-foreground hover:text-foreground transition-all hover:scale-110 z-50"
+        aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
       >
         {isCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
       </button>
 
-      {/* Brand / Logo Area - Premium */}
-      <div className={`flex items-center gap-3 mt-8 mb-12 px-6 transition-all duration-300 ${isCollapsed ? "justify-center" : ""}`}>
-        <div className="w-11 h-11 bg-gradient-to-br from-violet-600 via-indigo-600 to-amber-500 rounded-2xl flex items-center justify-center shadow-lg shadow-violet-500/30">
-          <GraduationCap size={26} className="text-white" />
+      {/* Brand */}
+      <div
+        className={`flex items-center gap-3 mt-8 mb-12 px-6 transition-all duration-300 ${
+          isCollapsed ? "lg:justify-center" : ""
+        }`}
+      >
+        <div className="w-11 h-11 bg-primary rounded-2xl flex items-center justify-center shadow-lg shadow-primary/20">
+          <GraduationCap size={20} className="text-white" />
         </div>
-        
+        {(!isCollapsed || (isCollapsed && window?.innerWidth >= 1024)) && (
+          <div className="hidden lg:block">
+            {/* <h1 className="text-xl font-medium tracking-[-0.04em] text-foreground">
+              Fusion Code
+            </h1> */}
+            <p className="text-[10px] tracking-[1.5px] text-muted-foreground -mt-1">
+              ACADEMY
+            </p>
+            <p>{role}</p>
+          </div>
+        )}
+        {/* On mobile always show brand when expanded */}
         {!isCollapsed && (
-          <div className="flex flex-col">
-            <h1 className="text-2xl font-bold tracking-[-0.04em] text-foreground">
+          <div className="lg:hidden">
+            <h1 className="text-2xl font-medium tracking-[-0.04em] text-foreground">
               Fusion Code
             </h1>
-            <p className="text-[10px] font-mono tracking-[1.5px] text-muted-foreground -mt-1">ACADEMY</p>
+            <p className="text-[10px] tracking-[1.5px] text-muted-foreground -mt-1">
+              ACADEMY
+            </p>
           </div>
         )}
       </div>
@@ -108,54 +175,107 @@ const Sidebar = ({ role }) => {
       {/* Navigation */}
       <nav className="px-3 flex-1 overflow-y-auto pb-8 space-y-1">
         {activeLinks.map((link) => {
-          const isActive = pathname === link.href;
-          
-          return (
-            <Link
-              key={link.href}
-              href={link.href}
-              title={isCollapsed ? link.name : ""}
-              className={`
-                group flex items-center gap-3.5 py-[13px] px-5  text-[20px] font-medium
-                transition-all duration-300 relative overflow-hidden
-                ${isActive 
-                  ? "bg-gradient-to-r from-violet-600 to-indigo-600 text-white shadow-lg shadow-violet-500/40" 
-                  : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/70 hover:text-foreground"
-                }
-                ${isCollapsed ? "justify-center px-0" : ""}
-              `}
-            >
-              {/* Active Indicator */}
-              {isActive && !isCollapsed && (
-                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-white/30 rounded-r-full" />
-              )}
+          const Icon = icons[link.name] || LayoutDashboard;
+          const isActive =
+            pathname === link.href ||
+            (link.subItems &&
+              link.subItems.some((sub) => pathname === sub.href));
+          const hasSubItems = link.subItems && link.subItems.length > 0;
+          const isExpanded = expandedMenus[link.name] || false;
 
-              <div className={`shrink-0 transition-transform duration-200 ${isActive ? "scale-110" : "group-hover:scale-110"}`}>
-                {getIcon(link.name)}
+          return (
+            <div key={link.name}>
+              {/* Main link row */}
+              <div
+                className={`
+                  group flex items-center justify-between rounded-xl
+                  transition-all duration-200
+                  ${
+                    isActive
+                      ? "bg-primary text-white shadow-md shadow-primary/20"
+                      : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                  }
+                  ${isCollapsed ? "lg:justify-center lg:px-0" : ""}
+                `}
+              >
+                <Link
+                  href={link.href}
+                  className={`flex items-center gap-3.5 py-3 px-5 flex-1 ${
+                    isCollapsed ? "lg:justify-center lg:px-0" : ""
+                  }`}
+                  title={isCollapsed ? link.name : ""}
+                >
+                  <div
+                    className={`shrink-0 transition-transform duration-200 ${
+                      isActive ? "scale-110" : "group-hover:scale-110"
+                    }`}
+                  >
+                    <Icon size={20} />
+                  </div>
+                  {!isCollapsed && (
+                    <span className="whitespace-nowrap tracking-tight font-light lg:inline">
+                      {link.name}
+                    </span>
+                  )}
+                </Link>
+
+                {/* Expand arrow for submenus */}
+                {hasSubItems && !isCollapsed && (
+                  <button
+                    onClick={() => toggleMenu(link.name)}
+                    className="pr-4 py-3 text-current hover:opacity-80 transition-opacity"
+                    aria-label={`Toggle ${link.name} submenu`}
+                  >
+                    <ChevronDown
+                      size={16}
+                      className={`transition-transform duration-200 ${
+                        isExpanded ? "rotate-180" : ""
+                      }`}
+                    />
+                  </button>
+                )}
               </div>
 
-              {!isCollapsed && (
-                <span className="whitespace-nowrap tracking-tight">
-                  {link.name}
-                </span>
+              {/* Submenu */}
+              {hasSubItems && !isCollapsed && isExpanded && (
+                <div className="ml-9 mt-1 space-y-1 overflow-hidden">
+                  {link.subItems.map((sub) => {
+                    const isSubActive = pathname === sub.href;
+                    return (
+                      <Link
+                        key={sub.name}
+                        href={sub.href}
+                        className={`
+                          flex items-center gap-3 py-2.5 px-4 rounded-lg text-sm
+                          transition-all duration-200
+                          ${
+                            isSubActive
+                              ? "bg-primary/10 text-primary font-medium"
+                              : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                          }
+                        `}
+                      >
+                        <Plus size={14} className="text-primary" />
+                        {sub.name}
+                      </Link>
+                    );
+                  })}
+                </div>
               )}
-
-              {/* Subtle shine effect on active */}
-              {isActive && (
-                <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent opacity-40 pointer-events-none" />
-              )}
-            </Link>
+            </div>
           );
         })}
       </nav>
 
-      {/* Footer Section */}
-      <div className={`mt-auto border-t border-border-custom p-4 ${isCollapsed ? "px-3" : ""}`}>
-        <div className={`flex items-center gap-3 text-xs text-muted-foreground ${isCollapsed ? "justify-center" : ""}`}>
+      {/* Footer */}
+      <div
+        className={`mt-auto border-t border-border-custom p-4 ${
+          isCollapsed ? "lg:px-3 lg:flex lg:justify-center" : ""
+        }`}
+      >
+        <div className="flex items-center gap-2 text-xs text-muted-foreground">
           {!isCollapsed && (
-            <div>
-              {/* Role: <span className="font-medium text-foreground capitalize">{role.toLowerCase()}</span> */}
-            </div>
+            <span className="capitalize">{role?.toLowerCase()} panel</span>
           )}
         </div>
       </div>

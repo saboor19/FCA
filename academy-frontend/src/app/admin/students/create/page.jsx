@@ -44,25 +44,29 @@ export default function CreateStudentPage() {
     }
   };
 
-  // Base input styling for consistency across text inputs and textareas
+  // Clean, theme‑aware input style
   const inputStyles =
-    "w-full border border-border-custom bg-transparent text-foreground placeholder:text-slate-400 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-shadow";
+    "w-full border border-border-custom bg-transparent text-foreground placeholder:text-muted-foreground rounded-xl p-3.5 focus:outline-none focus:ring-2 focus:ring-primary/40 transition-shadow";
 
   return (
     <DashboardLayout role="ADMIN">
-      <div className="max-w-4xl">
-        <h1 className="text-3xl font-bold mb-2 text-foreground">
-          Create Student
-        </h1>
-        <p className="text-slate-500 dark:text-slate-400 mb-8">
-          Add a new student profile.
-        </p>
+      {/* Wider container – uses available space, reads well on large screens */}
+      <div className="w-full max-w-6xl mx-auto">
+        <div className="flex flex-col gap-2 mb-8">
+          <h1 className="text-3xl font-semibold text-foreground tracking-tight">
+            Create Student
+          </h1>
+          <p className="text-muted-foreground">
+            Add a new student profile to the system.
+          </p>
+        </div>
 
         <form
           onSubmit={handleSubmit}
-          className="bg-card border border-border-custom rounded-2xl p-6 space-y-6 shadow-sm"
+          className="bg-card border border-border-custom rounded-2xl p-8 shadow-sm space-y-8"
         >
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Two‑column grid on larger screens, full width on mobile */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
             <input
               type="text"
               name="fullName"
@@ -76,7 +80,7 @@ export default function CreateStudentPage() {
             <input
               type="email"
               name="email"
-              placeholder="Email"
+              placeholder="Email address"
               value={formData.email}
               onChange={handleChange}
               className={inputStyles}
@@ -106,7 +110,7 @@ export default function CreateStudentPage() {
             <input
               type="text"
               name="phone"
-              placeholder="Phone"
+              placeholder="Phone number"
               value={formData.phone}
               onChange={handleChange}
               className={inputStyles}
@@ -117,10 +121,7 @@ export default function CreateStudentPage() {
               name="dateOfBirth"
               value={formData.dateOfBirth}
               onChange={handleChange}
-              className={inputStyles}
-              style={{
-                colorScheme: "var(--background) === '#ffffff' ? 'light' : 'dark'",
-              }} // Helps native date picker adapt
+              className={`${inputStyles} dark:[color-scheme:dark]`}
             />
 
             <input
@@ -142,20 +143,22 @@ export default function CreateStudentPage() {
             />
           </div>
 
+          {/* Address spans full width */}
           <textarea
             name="address"
-            placeholder="Address"
+            placeholder="Full address"
             value={formData.address}
             onChange={handleChange}
             className={inputStyles}
             rows={4}
           />
 
+          {/* Action button – aligned right, theme primary colour */}
           <div className="flex justify-end">
             <button
               type="submit"
               disabled={loading}
-              className="bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 px-6 py-3 rounded-lg font-medium hover:bg-slate-800 dark:hover:bg-slate-200 transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
+              className="bg-primary text-white px-6 py-3 rounded-xl font-medium hover:bg-primary-hover transition-colors disabled:opacity-70 disabled:cursor-not-allowed shadow-sm shadow-primary/20"
             >
               {loading ? "Creating..." : "Create Student"}
             </button>
