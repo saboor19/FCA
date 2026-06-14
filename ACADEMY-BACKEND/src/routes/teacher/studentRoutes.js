@@ -10,13 +10,8 @@ const {
 } = require(
   "../../middlewares/authMiddleware"
 );
-
-const {
-
-  getAssignedBatches,getBatchDetails
-
-} = require(
-  "../../controllers/teacher/batchController"
+const {getStudents,getStudentById} = require(
+  "../../controllers/teacher/studentController"
 );
 
 
@@ -25,18 +20,16 @@ router.use(
   authorizeRoles("TEACHER")
 );
 
-// GET MY BATCHES
-
 router.get(
-  "/",
-  getAssignedBatches
+  "/:id",
+  getStudentById
 );
 
+router.get("/", getStudents);
 
-
-router.get("/:id", getBatchDetails);
-
-
-
+router.get(
+  "/:id",
+  getStudentById
+);
 
 module.exports = router;

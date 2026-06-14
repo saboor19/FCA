@@ -10,7 +10,6 @@ import {
   BookOpen
 } from "lucide-react";
 
-import DashboardLayout from "@/components/dashboard/DashboardLayout";
 
 export default function NotFoundPage() {
   return (

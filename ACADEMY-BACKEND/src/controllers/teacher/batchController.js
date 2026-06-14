@@ -1,6 +1,14 @@
-const Teacher = require("../../models/Teacher");
-const Batch = require("../../models/Batch");
-const Student = require("../../models/Student");
+const Teacher =
+require("../../models/Teacher");
+
+const Batch =
+require("../../models/Batch");
+
+const Timetable =
+require("../../models/Timetable");
+
+const Enrollment =
+require("../../models/Enrollment");
 
 //-------------GET ASSIGNED BATCHES-------------
 exports.getAssignedBatches =
@@ -22,49 +30,75 @@ async(req,res) => {
 
     }
 
-    const batches =
-      await Batch.find({
-        teachers:teacher._id
+    // GET TEACHER TIMETABLES
+
+    const timetables =
+      await Timetable.find({
+        teacher:teacher._id,
+        isActive:true
       })
+
+      .populate(
+        "batch"
+      )
 
       .populate(
         "course",
         "title"
       )
 
-      .populate({
-        path:"teachers",
-        populate:{
-          path:"userId",
-          select:"fullName"
-        }
-      })
-
       .lean();
+
+    // REMOVE DUPLICATE BATCHES
+
+    const uniqueBatchMap =
+      new Map();
+
+    timetables.forEach((slot) => {
+
+      if(slot.batch){
+
+        uniqueBatchMap.set(
+          slot.batch._id.toString(),
+          {
+            ...slot.batch,
+            course:slot.course,
+            subject:slot.subject
+          }
+        );
+
+      }
+
+    });
+
+    const uniqueBatches =
+      Array.from(
+        uniqueBatchMap.values()
+      );
 
     // ADD STUDENT COUNT
 
-const formattedBatches =
-  await Promise.all(
+    const formattedBatches =
+      await Promise.all(
 
-    batches.map(async(batch) => {
+        uniqueBatches.map(
+          async(batch) => {
 
-      const studentsCount =
-        await Student.countDocuments({
-          batches:batch._id
-        });
+            const studentsCount =
+              await Enrollment.countDocuments({
+                batch:batch._id,
+                status:"ACTIVE"
+              });
 
-      return {
+            return {
+              ...batch,
+              studentsCount
+            };
 
-        ...batch,
+          }
+        )
 
-        studentsCount
-
-      };
-
-    })
-
-  );
+      );
 
     res.status(200).json({
       success:true,
@@ -73,6 +107,8 @@ const formattedBatches =
     });
 
   }catch(error){
+
+    console.log(error);
 
     res.status(500).json({
       success:false,
@@ -83,8 +119,10 @@ const formattedBatches =
 
 };
 
-//-------------GET SINGLE BATCH-------------
-exports.getBatchDetails = async(req,res) => {
+
+//-------------GET SINGLE BATCH DETAILS-------------
+exports.getBatchDetails =
+async(req,res) => {
 
   try{
 
@@ -103,36 +141,16 @@ exports.getBatchDetails = async(req,res) => {
     }
 
     const batch =
-      await Batch.findOne({
-
-        _id:req.params.id,
-
-        teachers:teacher._id
-
-      })
+      await Batch.findById(
+        req.params.id
+      )
 
       .populate(
         "course",
         "title description"
       )
 
-      .populate({
-        path:"students",
-
-        populate:{
-          path:"userId",
-          select:"fullName email"
-        }
-      })
-
-      .populate({
-        path:"teachers",
-
-        populate:{
-          path:"userId",
-          select:"fullName"
-        }
-      });
+      .lean();
 
     if(!batch){
 
@@ -143,12 +161,55 @@ exports.getBatchDetails = async(req,res) => {
 
     }
 
+    // CHECK WHETHER THIS BATCH
+    // IS ASSIGNED TO TEACHER
+
+    const isAssigned =
+      await require("../../models/Timetable")
+      .exists({
+        teacher:teacher._id,
+        batch:batch._id,
+        isActive:true
+      });
+
+    if(!isAssigned){
+
+      return res.status(403).json({
+        success:false,
+        message:"Unauthorized access"
+      });
+
+    }
+
+    // GET ENROLLED STUDENTS
+
+    const students =
+      await Enrollment.find({
+        batch:batch._id,
+        status:"ACTIVE"
+      })
+
+     .populate({
+  path:"student",
+  populate:{
+    path:"userId",
+    select:"fullName email"
+  }
+})
+
+      .lean();
+
     res.status(200).json({
       success:true,
-      data:batch
+      data:{
+        ...batch,
+        students
+      }
     });
 
   }catch(error){
+
+    console.log(error);
 
     res.status(500).json({
       success:false,

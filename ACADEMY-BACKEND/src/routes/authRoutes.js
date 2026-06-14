@@ -1,6 +1,6 @@
 const express = require("express");
 
-const { registerUser, loginUser,getMe } = require("../controllers/authController");
+const { registerUser, loginUser,getMe ,logoutUser} = require("../controllers/authController");
 const {
   protect,
   authorizeRoles
@@ -14,6 +14,9 @@ router.post("/register", registerUser);
 
 // Login
 router.post("/login", loginUser);
+
+// Logout
+router.post("/logout", protect, authorizeRoles("STUDENT","TEACHER","ADMIN"), logoutUser);
 
 //me
 router.get("/me",protect,getMe);

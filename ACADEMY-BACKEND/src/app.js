@@ -21,6 +21,8 @@ const teacherRoutes = require("./routes/teacher/batchRoutes")
 const feeRoutes = require("./routes/admin/feeRoutes");
 const financeRoutes=require("./routes/admin/financeRoutes")
 
+
+
 //-----------------public route imports------------------
 const publicCourseRoutes = require("./routes/courseRoutes");
 
@@ -33,7 +35,7 @@ const app = express();
 
 app.use(helmet());
 app.use(cors({
-  origin: "http://localhost:3000",
+  origin: true,
   credentials: true
 }));
 app.use(morgan("dev"));
@@ -79,8 +81,9 @@ app.use("/api/admin/finance",financeRoutes);
 //----------------TEACHER ROUTES------------
 app.use( "/api/teacher/batches", require("./routes/teacher/batchRoutes"));
 app.use( "/api/teacher/timetable", require("./routes/teacher/timetableRoutes"));
-
-
+app.use( "/api/teacher/attendance", require("./routes/teacher/attendanceRoutes"));
+app.use( "/api/teacher/students", require("./routes/teacher/studentRoutes"));
+app.use( "/api/teacher/notices", require("./routes/teacher/noticeRoutes") );
 //----error middleware 
 app.use(errorHandler);
 
