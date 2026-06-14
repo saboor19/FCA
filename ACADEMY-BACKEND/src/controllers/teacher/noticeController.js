@@ -149,8 +149,7 @@ async(req,res) => {
 
 };
 
-exports.markNoticeAsRead =
-async(req,res) => {
+exports.markNoticeAsRead =async(req,res) => {
 
   try{
 
@@ -169,7 +168,7 @@ async(req,res) => {
     }
 
     const alreadyRead =
-      notice.readBy.find(
+      notice.readBy.some(
         (item) =>
           item.user.toString()
           === req.user._id.toString()
@@ -178,10 +177,12 @@ async(req,res) => {
     if(!alreadyRead){
 
       notice.readBy.push({
-        user:req.user._id
+        user:req.user._id,
+        readAt:new Date()
       });
 
-      notice.views += 1;
+      notice.views =
+        notice.readBy.length;
 
       await notice.save();
 

@@ -14,7 +14,8 @@ import {
   Trash2,
   Megaphone,
   CheckCircle2,
-  Clock
+  Clock,
+  ArrowUpRightFromSquare
 } from "lucide-react";
 
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
@@ -32,6 +33,7 @@ export default function NoticeDetailsPage() {
 
   const [notice, setNotice] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showReaders,setShowReaders] = useState(false);
 
   useEffect(() => {
     if (noticeId) {
@@ -217,10 +219,35 @@ export default function NoticeDetailsPage() {
               
               <div>
                 <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">Total Views</p>
-                <p className="font-medium text-foreground flex items-center gap-2">
+                {/* <p className="font-medium text-foreground flex items-center gap-2">
                   <Eye size={16} className="text-emerald-500" />
                   {notice.views || 0} Views
-                </p>
+                </p> */}
+                
+                <button
+  type="button"
+  onClick={() =>
+    setShowReaders(true)
+  }
+  className="
+    font-medium
+    text-foreground
+    flex
+    items-center
+    gap-2
+    hover:text-indigo-600
+    transition
+  "
+>
+
+  <Eye
+    size={16}
+    className="text-emerald-500"
+  />
+
+  {notice.views || 0} Views <ArrowUpRightFromSquare/>
+
+</button>
               </div>
 
               <div>
@@ -279,6 +306,203 @@ export default function NoticeDetailsPage() {
 
         </div>
       </div>
+
+
+
+
+
+
+
+
+        {/* READERS MODAL */}
+        {
+  showReaders && (
+
+    <div
+      className="
+        fixed
+        inset-0
+        z-50
+        bg-black/50
+        flex
+        items-center
+        justify-center
+        p-4
+      "
+    >
+
+      <div
+        className="
+          w-full
+          max-w-2xl
+          bg-card
+          border
+          rounded-3xl
+          shadow-2xl
+          overflow-hidden
+        "
+      >
+
+        {/* HEADER */}
+
+        <div
+          className="
+            px-6
+            py-5
+            border-b
+            flex
+            items-center
+            justify-between
+          "
+        >
+
+          <div>
+
+            <h2
+              className="
+                text-xl
+                font-bold
+              "
+            >
+
+              Notice Readers
+
+            </h2>
+
+            <p
+              className="
+                text-sm
+                text-muted-foreground
+                mt-1
+              "
+            >
+
+              Users who viewed this notice
+
+            </p>
+
+          </div>
+
+          <button
+            onClick={() =>
+              setShowReaders(false)
+            }
+            className="
+              text-sm
+              text-muted-foreground
+              hover:text-foreground
+            "
+          >
+
+            Close
+
+          </button>
+
+        </div>
+
+        {/* BODY */}
+
+        <div
+          className="
+            max-h-[500px]
+            overflow-y-auto
+            divide-y
+          "
+        >
+
+          {
+            notice.readBy?.length > 0 ? (
+
+              notice.readBy.map(
+                (item,index) => (
+
+                  <div
+                    key={index}
+                    className="
+                      p-5
+                      flex
+                      items-center
+                      justify-between
+                    "
+                  >
+
+                    <div>
+
+                      <h3
+                        className="
+                          font-semibold
+                        "
+                      >
+
+                        {
+                          item.user
+                          ?.fullName
+                        }
+
+                      </h3>
+
+                      <p
+                        className="
+                          text-sm
+                          text-muted-foreground
+                          mt-1
+                        "
+                      >
+
+                        {
+                          item.user
+                          ?.email
+                        }
+
+                      </p>
+
+                    </div>
+
+                    <div
+                      className="
+                        text-sm
+                        text-muted-foreground
+                      "
+                    >
+
+                      {
+                        new Date(
+                          item.readAt
+                        ).toLocaleString()
+                      }
+
+                    </div>
+
+                  </div>
+
+                )
+              )
+
+            ) : (
+
+              <div
+                className="
+                  py-16
+                  text-center
+                  text-muted-foreground
+                "
+              >
+
+                No readers yet
+
+              </div>
+
+            )
+          }
+
+        </div>
+
+      </div>
+
+    </div>
+
+  )
+}
     </DashboardLayout>
   );
 }

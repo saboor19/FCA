@@ -91,7 +91,8 @@ exports.getNotices = async(req,res) => {
 
 
 //-------------GET SINGLE NOTICE-------------
-exports.getNotice = async(req,res) => {
+exports.getNotice =
+async(req,res) => {
 
   try{
 
@@ -108,6 +109,11 @@ exports.getNotice = async(req,res) => {
       .populate(
         "batches",
         "name"
+      )
+
+      .populate(
+        "readBy.user",
+        "fullName email role"
       );
 
     if(!notice){

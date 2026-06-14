@@ -85,6 +85,14 @@ app.use( "/api/teacher/attendance", require("./routes/teacher/attendanceRoutes")
 app.use( "/api/teacher/students", require("./routes/teacher/studentRoutes"));
 app.use( "/api/teacher/notices", require("./routes/teacher/noticeRoutes") );
 //----error middleware 
+
+
+
+//----------------image upload routes----------------
+app.use("/api/files", require("./routes/uploadRoutes"));
+
+
+
 app.use(errorHandler);
 
 
