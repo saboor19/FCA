@@ -188,10 +188,15 @@ new mongoose.Schema({
   timestamps:true
 });
 
+assignmentSubmissionSchema.index({
+  assignmentId:1,
+  studentId:1,
+  status:1
+});
 
 
 module.exports =
 mongoose.model(
   "AssignmentSubmission",
   assignmentSubmissionSchema
-);ok
+);

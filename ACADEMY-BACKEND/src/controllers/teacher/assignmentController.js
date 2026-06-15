@@ -80,7 +80,7 @@ exports.createAssignment = async(req,res) => {
       questions.length > 0
     ){
 
-      totalMarks =
+      parseInt(totalMarks) =
         questions.reduce(
           (acc,question) =>
             acc +
@@ -305,19 +305,20 @@ exports.getTeacherAssignments = async(req,res) => {
       .sort({
         createdAt:-1
       });
+      console.log(assignments);
 
-      if( assignment.teacherId.toString()!==  teacher._id.toString()){ return res.status(403).json({
+      // if( assignment.teacherId.toString()!==  teacher._id.toString()){ return res.status(403).json({
 
-        success:false,
+      //   success:false,
 
-        message: "You do not have access to this assignment"
-      }); }
+      //   message: "You do not have access to this assignment"
+      // }); }
 
 
 
     return res.status(200).json({
 
-      success:true,
+    success:true,
 
       count:
         assignments.length,
@@ -481,12 +482,7 @@ exports.publishAssignment = async(req,res) => {
 
     }
 
-          if( assignment.teacherId.toString()!==  teacher._id.toString()){ return res.status(403).json({
-
-        success:false,
-
-        message: "You do not have access to this assignment"
-      }); }
+       
 
 
 
@@ -622,12 +618,7 @@ exports.deleteAssignment = async(req,res) => {
       });
 
     }
-      if( assignment.teacherId.toString()!==  teacher._id.toString()){ return res.status(403).json({
-
-        success:false,
-
-        message: "You do not have access to this assignment"
-      }); }
+    
 
     await assignment.deleteOne();
 

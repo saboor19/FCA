@@ -11,6 +11,25 @@ new mongoose.Schema({
     type:String,
     required:true
   },
+  guidelines:{
+  type:String
+},
+
+wordLimit:{
+  type:Number
+},
+allowedFileTypes:{
+  type:String
+},
+
+maxFileSize:{
+  type:Number
+},
+
+maxFiles:{
+  type:Number,
+  default:1
+},
 
 
 

@@ -7,7 +7,7 @@ import { Inter } from "next/font/google";
 import {
   LayoutDashboard,
   BookOpen,
-  Users,
+  Users,User2,
   CalendarDays,
   FileText,
   Wallet,
@@ -97,6 +97,7 @@ const Sidebar = ({ role }) => {
       { name: "Notices", href: "/teacher/notices" },
       { name: "Timetable", href: "/teacher/timetable" },
       { name: "Reports", href: "/teacher/reports" },
+      { name: "Profile", href: "/teacher/profile" },
     ],
     STUDENT: [
       { name: "Dashboard", href: "/student/dashboard" },

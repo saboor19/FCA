@@ -92,7 +92,8 @@ app.use( "/api/teacher/notices", require("./routes/teacher/noticeRoutes") );
 app.use( "/api/teacher/profile", require("./routes/teacher/profileRoutes") );
 app.use("/api/teacher/assignments",require("./routes/teacher/assignmentRoutes") );
 
-
+//----------------STUDENT ROUTES----------------
+ app.use("/api/student/assignments", require("./routes/student/assignmentRoutes"));
 
 //----------------image upload routes----------------
 app.use("/api/uploads", require("./routes/uploadRoutes"));

@@ -44,7 +44,7 @@ async(req,res) => {
 
       .populate(
         "course",
-        "title"
+        "title modules"
       )
 
       .lean();
@@ -147,7 +147,7 @@ async(req,res) => {
 
       .populate(
         "course",
-        "title description"
+        "title modules description"
       )
 
       .lean();
@@ -196,6 +196,7 @@ async(req,res) => {
     select:"fullName email"
   }
 })
+.populate("course")
 
       .lean();
 
