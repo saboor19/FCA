@@ -91,3 +91,17 @@ async(submissionId)=>{
   return response.data;
 
 };
+
+//---------------------------------------
+
+export const getStudentSubmission =
+async(id)=>{
+
+  const response =
+  await api.get(
+    `/student/assignments/submissions/${id}`
+  );
+
+  return response.data;
+
+};

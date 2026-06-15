@@ -59,30 +59,43 @@ exports.getStudentAssignments = async(req,res)=>{
             ===
             assignment._id.toString()
         );
-        return {
-          _id:assignment._id,
-          title:assignment.title,
-          description:
-            assignment.description,
-          dueDate:
-            assignment.dueDate,
-          totalMarks:
-            assignment.totalMarks,
-          assignmentStatus:
-            assignment.status,
-          submissionStatus:
-            submission
-              ? submission.status
-              : "NOT_STARTED",
-          submittedAt:
-            submission
-              ? submission.submittedAt
-              : null,
-          obtainedMarks:
-            submission
-              ? submission.obtainedMarks
-              : 0
-        };
+return {
+  _id:assignment._id,
+
+  title:assignment.title,
+
+  description:
+    assignment.description,
+
+  dueDate:
+    assignment.dueDate,
+
+  totalMarks:
+    assignment.totalMarks,
+
+  assignmentStatus:
+    assignment.status,
+
+  submissionStatus:
+    submission
+      ? submission.status
+      : "NOT_STARTED",
+
+  submissionId:
+    submission
+      ? submission._id
+      : null,
+
+  submittedAt:
+    submission
+      ? submission.submittedAt
+      : null,
+
+  obtainedMarks:
+    submission
+      ? submission.obtainedMarks
+      : 0
+};
 
       }
     );
@@ -1114,5 +1127,96 @@ exports.submitAssignment = async(req,res)=>{
 
 };
 
+exports.getStudentSubmission = async(req,res)=>{
+
+  try{
+
+    const student =
+    await Student.findOne({
+      userId:req.user._id
+    });
+
+
+
+    if(!student){
+
+      return res.status(404).json({
+        success:false,
+        message:"Student not found"
+      });
+
+    }
+
+
+
+    const submission =
+    await AssignmentSubmission.findById(
+      req.params.id
+    )
+
+    .populate(
+      "assignmentId"
+    )
+
+    .populate(
+      "studentId",
+      "fullName email"
+    );
+
+
+
+    if(!submission){
+
+      return res.status(404).json({
+
+        success:false,
+        message:"Submission not found"
+
+      });
+
+    }
+
+
+
+    // SECURITY CHECK
+    if(
+
+      submission.studentId._id.toString()
+      !==
+      student._id.toString()
+
+    ){
+
+      return res.status(403).json({
+
+        success:false,
+        message:"Unauthorized access"
+
+      });
+
+    }
+
+
+
+    return res.status(200).json({
+
+      success:true,
+      submission
+
+    });
+
+  }
+  catch(error){
+
+    return res.status(500).json({
+
+      success:false,
+      message:error.message
+
+    });
+
+  }
+
+};
 
 

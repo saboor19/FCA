@@ -2,8 +2,6 @@ const express = require("express");
 
 const router = express.Router();
 
-
-
 const {
 
   createAssignment,
@@ -18,12 +16,17 @@ const {
 
   closeAssignment,
 
-  deleteAssignment
+  deleteAssignment,
+
+  getAssignmentSubmissions,
+
+  getSingleSubmission,
+  
+  gradeSubmission
 
 } = require(
   "../../controllers/teacher/assignmentController"
 );
-
 
 
 const {
@@ -96,6 +99,28 @@ router.patch(
   closeAssignment
 );
 
+
+router.get(
+  "/submissions/:submissionId",
+  protect,
+  authorizeRoles("TEACHER"),
+  getSingleSubmission
+);
+
+router.get(
+  "/:assignmentId/submissions",
+  protect,
+  authorizeRoles("TEACHER"),
+  getAssignmentSubmissions
+);
+
+
+router.patch(
+  "/submissions/:submissionId/grade",
+  protect,
+  authorizeRoles("TEACHER"),
+  gradeSubmission
+);
 
 
 // DELETE

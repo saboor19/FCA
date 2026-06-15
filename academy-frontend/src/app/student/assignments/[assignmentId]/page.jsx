@@ -1,5 +1,5 @@
 "use client";
-
+import { useRouter } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
 import { useParams } from "next/navigation";
 
@@ -17,7 +17,7 @@ import {
 
 export default function StudentAssignmentDetailsPage() {
   const { assignmentId } = useParams();
-
+  const router = useRouter();
   const [assignment, setAssignment] = useState(null);
   const [submission, setSubmission] = useState(null);
   const [answers, setAnswers] = useState([]);
@@ -77,18 +77,38 @@ export default function StudentAssignmentDetailsPage() {
     }
   };
 
-  const handleSaveAnswers = async () => {
-    try {
-      if (!submission?._id) return;
-      setSaving(true);
-      // Use the ref here to ensure we grab the latest keystrokes
-      await saveAssignmentAnswers(submission._id, { answers: latestAnswers.current });
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setSaving(false);
-    }
-  };
+const handleSaveAnswers = async () => {
+
+  try {
+
+    if(!submission?._id) return;
+
+    setSaving(true);
+
+    await saveAssignmentAnswers(
+      submission._id,
+      {
+        answers:latestAnswers.current
+      }
+    );
+
+router.push(
+  `/student/assignments/submissions/${submission._id}`
+);
+
+  }
+  catch(error){
+
+    console.error(error);
+
+  }
+  finally{
+
+    setSaving(false);
+
+  }
+
+};
 
   const handleSubmitAssignment = async () => {
     try {
@@ -224,57 +244,126 @@ export default function StudentAssignmentDetailsPage() {
                 Once you start the assignment, the questions will be revealed and your timer (if applicable) will begin counting down.
               </p>
               
-              <button
-                onClick={handleStartAssignment}
-                disabled={starting}
-                className="mt-8 w-full md:w-auto rounded-full bg-slate-900 dark:bg-yellow-500 px-8 py-3.5 text-sm font-semibold text-white dark:text-black transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50 disabled:hover:scale-100 shadow-md"
-              >
-                {starting ? "Initializing..." : "Start Assignment"}
-              </button>
+{
+  submission &&
+  [
+    "SUBMITTED",
+    "GRADED",
+    "LATE",
+    "AUTO_SUBMITTED"
+  ].includes(
+    submission.status
+  )
+
+  ?
+
+  <button
+    onClick={()=>
+      router.push(
+        `/student/assignments/submissions/${submission._id}`
+      )
+    }
+    className="
+      mt-8
+      w-full
+      md:w-auto
+      rounded-full
+      bg-green-600
+      px-8
+      py-3.5
+      text-sm
+      font-semibold
+      text-white
+    "
+  >
+    View Submission
+  </button>
+
+  :
+
+  <button
+    onClick={handleStartAssignment}
+    disabled={starting}
+    className="
+      mt-8
+      w-full
+      md:w-auto
+      rounded-full
+      bg-slate-900
+      dark:bg-yellow-500
+      px-8
+      py-3.5
+      text-sm
+      font-semibold
+      text-white
+      dark:text-black
+    "
+  >
+    {
+      starting
+      ? "Initializing..."
+      : "Start Assignment"
+    }
+  </button>
+}
             </div>
           )}
 
           {/* ACTIVE ASSIGNMENT STATE */}
-          {started && (
-            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-              
-              {/* TOP BAR: Timer & Progress */}
-              <div className="sticky top-4 z-40 flex items-center justify-between gap-4">
-                {assignment.timeLimit ? (
-                  <AssignmentTimer 
-                    startedAt={submission?.startedAt} 
-                    timeLimit={assignment.timeLimit} 
-                    onTimeUp={handleAutoSubmit} 
-                  />
-                ) : <div />} {/* Empty div for flex spacing if no timer */}
+        
+{
+  started && (
 
-                <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 backdrop-blur px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 shadow-sm">
-                  Answered: <span className="text-slate-900 dark:text-white">{answers.length}</span> / {assignment.questions.length}
-                </div>
-              </div>
+    <>
 
-              {/* QUESTIONS LIST */}
-              <div className="space-y-6">
-                {assignment.questions.map((question, index) => (
-                  <QuestionRenderer
-                    key={question._id}
-                    question={question}
-                    index={index}
-                    answers={answers}
-                    setAnswers={setAnswers}
-                  />
-                ))}
-              </div>
+      {
+        assignment.timeLimit &&
+        submission?.startedAt && (
 
-              {/* ACTION BAR */}
-              <AssignmentActions
-                saving={saving}
-                submitting={submitting}
-                onSave={handleSaveAnswers}
-                onSubmit={handleSubmitAssignment}
+          <AssignmentTimer
+            startedAt={submission.startedAt}
+            timeLimit={assignment.timeLimit}
+            onTimeUp={handleAutoSubmit}
+          />
+
+        )
+      }
+
+      <div
+        className="
+          mt-6
+          space-y-4
+        "
+      >
+
+        {
+          assignment.questions.map(
+            (question,index)=>(
+              <QuestionRenderer
+                key={question._id}
+                question={question}
+                index={index}
+                answers={answers}
+                setAnswers={setAnswers}
               />
-            </div>
-          )}
+            )
+          )
+        }
+
+      </div>
+
+      <AssignmentActions
+        saving={saving}
+        submitting={submitting}
+        onSave={handleSaveAnswers}
+        onSubmit={handleSubmitAssignment}
+      />
+
+    </>
+
+  )
+}
+
 
         </div>
       </div>

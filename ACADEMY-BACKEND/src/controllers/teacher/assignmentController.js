@@ -4,8 +4,14 @@ require("../../models/Assignment");
 const Batch =
 require("../../models/Batch");
 
+const AssignmentSubmission = 
+require("../../models/AssignmentSubmission");
+
 const Teacher =
 require("../../models/Teacher");
+
+const Student =
+require("../../models/Student");
 
 const validateTeacherAssignment =
 require("../../utils/assignment/validateTeacherAssignment");
@@ -80,17 +86,13 @@ exports.createAssignment = async(req,res) => {
       questions.length > 0
     ){
 
-      parseInt(totalMarks) =
-        questions.reduce(
-          (acc,question) =>
-            acc +
-            (
-              question.marks || 0
-            ),
-          0
-        );
-
-    }
+totalMarks =
+  questions.reduce(
+    (acc,question) =>
+      acc + (question.marks || 0),
+    0
+  );
+}
 
 
 
@@ -186,18 +188,19 @@ exports.createAssignment = async(req,res) => {
 
   }
   catch(error){
+  console.log(error);
 
-    return res.status(500).json({
-
-      success:false,
-
-      message:error.message
-
-    });
+  return res.status(500).json({
+    success:false,
+    message:error.message,
+    stack:error.stack
+  });
 
   }
 
 };
+
+
 exports.getSingleAssignment = async(req,res) => {
 
   try{
@@ -235,6 +238,15 @@ exports.getSingleAssignment = async(req,res) => {
       });
 
     }
+    const teacher =  await Teacher.findOne({    userId:req.user._id  });
+
+
+    if(  assignment.teacherId.toString() !== teacher._id.toString()){ return res.status(403).json({
+
+        success:false,
+
+        message: "You do not have access to this assignment"
+      }); }
 
 
 
@@ -365,7 +377,10 @@ exports.updateAssignment = async(req,res) => {
       });
 
     }
-      if( assignment.teacherId.toString()!==  teacher._id.toString()){ return res.status(403).json({
+         const teacher =  await Teacher.findOne({    userId:req.user._id  });
+
+
+    if(  assignment.teacherId.toString() !== teacher._id.toString()){ return res.status(403).json({
 
         success:false,
 
@@ -481,6 +496,16 @@ exports.publishAssignment = async(req,res) => {
       });
 
     }
+      const teacher =  await Teacher.findOne({    userId:req.user._id  });
+
+
+    if(  assignment.teacherId.toString() !== teacher._id.toString()){ return res.status(403).json({
+
+        success:false,
+
+        message: "You do not have access to this assignment"
+      }); }
+
 
        
 
@@ -548,12 +573,16 @@ exports.closeAssignment = async(req,res) => {
 
     }
 
-          if( assignment.teacherId.toString()!==  teacher._id.toString()){ return res.status(403).json({
+  const teacher =  await Teacher.findOne({    userId:req.user._id  });
+
+
+    if(  assignment.teacherId.toString() !== teacher._id.toString()){ return res.status(403).json({
 
         success:false,
 
         message: "You do not have access to this assignment"
       }); }
+
 
 
 
@@ -618,6 +647,16 @@ exports.deleteAssignment = async(req,res) => {
       });
 
     }
+      const teacher =  await Teacher.findOne({    userId:req.user._id  });
+
+
+    if(  assignment.teacherId.toString() !== teacher._id.toString()){ return res.status(403).json({
+
+        success:false,
+
+        message: "You do not have access to this assignment"
+      }); }
+
     
 
     await assignment.deleteOne();
@@ -640,6 +679,423 @@ exports.deleteAssignment = async(req,res) => {
 
       success:false,
 
+      message:error.message
+
+    });
+
+  }
+
+};
+
+
+exports.getAssignmentSubmissions =
+async(req,res)=>{
+
+  try{
+
+    const teacher =
+    await Teacher.findOne({
+      userId:req.user._id
+    });
+
+    if(!teacher){
+
+      return res.status(404).json({
+        success:false,
+        message:"Teacher not found"
+      });
+
+    }
+
+    const assignment =
+    await Assignment.findById(
+      req.params.assignmentId
+    );
+
+    if(!assignment){
+
+      return res.status(404).json({
+        success:false,
+        message:"Assignment not found"
+      });
+
+    }
+
+    if(
+      assignment.teacherId.toString()
+      !==
+      teacher._id.toString()
+    ){
+
+      return res.status(403).json({
+        success:false,
+        message:
+          "You do not have access to this assignment"
+      });
+
+    }
+
+const submissions =
+await AssignmentSubmission.find({
+  assignmentId:req.params.assignmentId
+})
+
+.populate({
+  path:"studentId",
+  select:"fullName email profileImage"
+})
+
+.populate({
+  path:"gradedBy",
+  select:"fullName"
+})
+
+.sort({
+  submittedAt:-1
+});
+
+
+
+const formattedSubmissions =
+submissions.map(
+  (submission)=>({
+
+    _id:
+      submission._id,
+
+    student:
+      submission.studentId,
+
+    status:
+      submission.status,
+
+    obtainedMarks:
+      submission.obtainedMarks,
+
+    percentage:
+      submission.percentage,
+
+    submittedAt:
+      submission.submittedAt,
+
+    gradedAt:
+      submission.gradedAt,
+
+    answerCount:
+      submission.answers.length,
+
+    feedback:
+      submission.feedback
+
+  })
+);
+
+    return res.status(200).json({
+
+  success:true,
+
+  count:
+    formattedSubmissions.length,
+
+  submissions:
+    formattedSubmissions
+
+
+    });
+
+  }
+  catch(error){
+
+    return res.status(500).json({
+
+      success:false,
+      message:error.message
+
+    });
+
+  }
+
+};
+
+
+exports.getSingleSubmission =
+async(req,res)=>{
+
+  try{
+
+    const teacher =
+    await Teacher.findOne({
+      userId:req.user._id
+    });
+
+    if(!teacher){
+
+      return res.status(404).json({
+        success:false,
+        message:"Teacher not found"
+      });
+
+    }
+
+    const submission =
+    await AssignmentSubmission.findById(
+      req.params.submissionId
+    )
+
+   .populate({
+  path:"studentId",
+  populate:{
+    path:"userId",
+    select:"fullName email"
+  }
+})
+
+    .populate(
+      "assignmentId"
+    );
+
+
+
+    if(!submission){
+
+      return res.status(404).json({
+
+        success:false,
+        message:"Submission not found"
+
+      });
+
+    }
+
+
+
+    const assignment =
+      submission.assignmentId;
+
+
+
+    if(
+
+      assignment.teacherId.toString()
+      !==
+      teacher._id.toString()
+
+    ){
+
+      return res.status(403).json({
+
+        success:false,
+        message:
+          "You do not have access to this submission"
+
+      });
+
+    }
+
+
+
+    return res.status(200).json({
+
+      success:true,
+
+      submission
+
+    });
+
+  }
+  catch(error){
+
+    return res.status(500).json({
+
+      success:false,
+      message:error.message
+
+    });
+
+  }
+
+};
+
+
+exports.gradeSubmission =
+async(req,res)=>{
+
+  try{
+
+    const {
+      answers,
+      feedback
+    } = req.body;
+
+
+
+    const teacher =
+    await Teacher.findOne({
+      userId:req.user._id
+    });
+
+
+
+    if(!teacher){
+
+      return res.status(404).json({
+
+        success:false,
+        message:"Teacher not found"
+
+      });
+
+    }
+
+
+
+    const submission =
+    await AssignmentSubmission.findById(
+      req.params.submissionId
+    )
+
+    .populate(
+      "assignmentId"
+    );
+
+
+
+    if(!submission){
+
+      return res.status(404).json({
+
+        success:false,
+        message:"Submission not found"
+
+      });
+
+    }
+
+
+
+    if(
+
+      submission.assignmentId.teacherId.toString()
+      !==
+      teacher._id.toString()
+
+    ){
+
+      return res.status(403).json({
+
+        success:false,
+        message:
+          "You do not have access to this submission"
+
+      });
+
+    }
+
+
+
+    let obtainedMarks = 0;
+
+
+
+    submission.answers =
+    submission.answers.map(
+      (answer)=>{
+
+        const gradedAnswer =
+        answers.find(
+          (item)=>
+            item.questionId ===
+            answer.questionId.toString()
+        );
+
+
+
+        if(gradedAnswer){
+
+          answer.marksAwarded =
+            gradedAnswer.marksAwarded || 0;
+
+          answer.teacherRemark =
+            gradedAnswer.teacherRemark || "";
+
+
+
+          obtainedMarks +=
+            answer.marksAwarded;
+
+        }
+
+        return answer;
+
+      }
+    );
+
+
+
+    submission.obtainedMarks =
+      obtainedMarks;
+
+
+
+    submission.percentage =
+      submission.assignmentId
+      .totalMarks > 0
+
+      ?
+
+      (
+        obtainedMarks /
+        submission.assignmentId
+        .totalMarks
+      ) * 100
+
+      :
+
+      0;
+
+
+
+    submission.feedback =
+      feedback || "";
+
+
+
+    submission.status =
+      "GRADED";
+
+
+
+    submission.gradedBy =
+      teacher._id;
+
+
+
+    submission.gradedAt =
+      new Date();
+
+
+
+    await submission.save();
+
+
+
+    return res.status(200).json({
+
+      success:true,
+
+      message:
+        "Submission graded successfully",
+
+      submission
+
+    });
+
+  }
+  catch(error){
+
+    return res.status(500).json({
+
+      success:false,
       message:error.message
 
     });

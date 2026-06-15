@@ -126,7 +126,7 @@ useRef(false);
       className={`
         sticky
         top-0
-        z-40
+        z-100
         mb-6
         flex
         items-center

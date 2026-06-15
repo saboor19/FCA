@@ -368,6 +368,9 @@ function AssignmentCard({ assignment, onPublish, onClose, onDelete, isProcessing
           <Icons.Eye className="h-3.5 w-3.5" />
           View
         </Link>
+        <Link href={`/teacher/assignments/${assignment._id}/submissions`}>
+            View Submissions
+        </Link>
 
         <Link
           href={`/teacher/assignments/${assignment._id}/edit`}

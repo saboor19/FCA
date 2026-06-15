@@ -2,10 +2,12 @@
 
 import Link from "next/link";
 
-
+import {useRouter}
+from "next/navigation";
 
 export default function
 AssignmentCard({ assignment }){
+  const router = useRouter();
 
   // ---------------- STATUS COLORS ----------------
 
@@ -180,35 +182,38 @@ AssignmentCard({ assignment }){
         >
 
           <Link
-            href={
-              `/student/assignments/${assignment._id}`
-            }
-            className="
-              inline-flex
-              w-full
-              items-center
-              justify-center
-              rounded-2xl
-              bg-slate-900
-              px-5
-              py-3
-              text-sm
-              font-medium
-              text-white
-              transition
-              hover:opacity-90
-              dark:bg-white
-              dark:text-slate-900
-              md:w-auto
-            "
-          >
-            {
-              buttonLabel[
-                assignment
-                .submissionStatus
-              ]
-            }
-          </Link>
+  href={
+    assignment.submissionStatus === "SUBMITTED" ||
+    assignment.submissionStatus === "GRADED" ||
+    assignment.submissionStatus === "LATE"
+      ? `/student/assignments/submissions/${assignment.submissionId}`
+      : `/student/assignments/${assignment._id}`
+  }
+  className="
+    inline-flex
+    w-full
+    items-center
+    justify-center
+    rounded-2xl
+    bg-slate-900
+    px-5
+    py-3
+    text-sm
+    font-medium
+    text-white
+    transition
+    hover:opacity-90
+    dark:bg-white
+    dark:text-slate-900
+    md:w-auto
+  "
+>
+  {
+    buttonLabel[
+      assignment.submissionStatus
+    ]
+  }
+</Link>
 
         </div>
 

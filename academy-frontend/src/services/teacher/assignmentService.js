@@ -106,3 +106,48 @@ async(id) => {
   return response.data;
 
 };
+
+//----------GET SUBMISSIONS OF THE ASSIGNMENT-----
+export const getAssignmentSubmissions =
+async(assignmentId)=>{
+
+  const response =
+  await api.get(
+    `/teacher/assignments/${assignmentId}/submissions`
+  );
+
+  return response.data;
+
+};
+
+
+export const getSingleSubmission =
+async(submissionId)=>{
+
+  const response =
+  await api.get(
+    `/teacher/assignments/submissions/${submissionId}`
+  );
+
+  return response.data;
+
+};
+
+export const gradeSubmission =
+async(
+  submissionId,
+  data
+)=>{
+
+  const response =
+  await api.patch(
+
+    `/teacher/assignments/submissions/${submissionId}/grade`,
+
+    data
+
+  );
+
+  return response.data;
+
+};
