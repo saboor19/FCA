@@ -35,7 +35,12 @@ const app = express();
 
 app.use(helmet());
 app.use(cors({
-  origin: true,
+  origin: [
+    "http://localhost:3000",
+    "http://192.168.1.4:3000",
+    "http://10.106.186.113:3000",
+    "http://192.168.1.*:3000"
+  ],
   credentials: true
 }));
 app.use(morgan("dev"));
@@ -84,15 +89,16 @@ app.use( "/api/teacher/timetable", require("./routes/teacher/timetableRoutes"));
 app.use( "/api/teacher/attendance", require("./routes/teacher/attendanceRoutes"));
 app.use( "/api/teacher/students", require("./routes/teacher/studentRoutes"));
 app.use( "/api/teacher/notices", require("./routes/teacher/noticeRoutes") );
-//----error middleware 
+app.use( "/api/teacher/profile", require("./routes/teacher/profileRoutes") );
+app.use("/api/teacher/assignments",require("./routes/teacher/assignmentRoutes") );
 
 
 
 //----------------image upload routes----------------
-app.use("/api/files", require("./routes/uploadRoutes"));
+app.use("/api/uploads", require("./routes/uploadRoutes"));
 
 
-
+//----error middleware 
 app.use(errorHandler);
 
 

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import ThemeToggle from "../theme-toggle";
-
+import { logoutUser } from "@/services/authService";
 const NavLink = ({ href, children }) => {
   return (
     <Link

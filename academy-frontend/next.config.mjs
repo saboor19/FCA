@@ -3,7 +3,7 @@ const nextConfig = {
   reactCompiler: true,
   allowedDevOrigins: [
     'localhost',
-    '192.168.1.5', 
+    '192.168.1.4', 
     '10.106.186.113',     // your mobile IP
     '192.168.1.*',      // any device on the same subnet
   ],
@@ -11,7 +11,7 @@ const nextConfig = {
     return [
       {
         source: '/api/:path*',
-        destination: 'http://localhost:5000/api/:path*', // Your backend address
+        destination: `${process.env.NEXT_PUBLIC_API_URL}/api/:path*`, // Your backend address
       },
     ];
   },

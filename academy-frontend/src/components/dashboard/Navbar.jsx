@@ -5,7 +5,7 @@ import { useAuth } from "@/context/AuthContext";
 import { LogOut, UserCircle, Bell, Search, ChevronDown } from "lucide-react";
 import { useState } from "react";
 import ThemeToggle from "../theme-toggle";
-
+import { logoutUser } from "@/services/authService";
 const Navbar = () => {
   const router = useRouter();
   const { user, setUser } = useAuth();
@@ -14,16 +14,13 @@ const Navbar = () => {
 
   const handleLogout = async () => {
     try {
-      await fetch("http://localhost:5000/api/auth/logout", {
-        method: "POST",
-        credentials: "include",
-      });
-      setUser(null);
-      router.push("/login");
+      await logoutUser();
     } catch (error) {
       console.error("Logout failed:", error);
     }
-  };
+    setUser(null);
+    router.push("/login");
+  }
 
   const userInitials = user?.name 
     ? user.name.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2)
@@ -144,10 +141,12 @@ const Navbar = () => {
               </div>
 
 
-
+``
               <div className="py-2">
-                <button className="w-full px-6 py-3 text-left hover:bg-accent flex items-center gap-3 text-sm">
+                <button onClick={() => router.push('/teacher/profile')} className="w-full px-6 py-3 text-left hover:bg-accent flex items-center gap-3 text-sm">
                   <UserCircle size={18} /> Profile Settings
+                  
+
                 </button>
                 <button className="w-full px-6 py-3 text-left hover:bg-accent flex items-center gap-3 text-sm">
                   Billing &amp; Plans
@@ -164,7 +163,7 @@ const Navbar = () => {
                   onClick={handleLogout}
                   className="w-full px-6 py-3 text-left text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/50 flex items-center gap-3 text-sm font-medium"
                 >
-                  <LogOut size={18} /> Sign Out
+                  <LogOut size={18}  /> Sign Out
                 </button>
               </div>
             </div>

@@ -69,7 +69,7 @@ uploadStream.on(
 };
 
 
-exports.getFile =async(req,res) => {
+exports.getFile = async(req,res) => {
 
   try{
 
@@ -81,10 +81,47 @@ exports.getFile =async(req,res) => {
         req.params.id
       );
 
+
+
+    // GET FILE METADATA
+    const files =
+      await bucket.find({
+        _id:fileId
+      }).toArray();
+
+
+
+    if(!files || files.length === 0){
+
+      return res.status(404).json({
+        success:false,
+        message:"File not found"
+      });
+
+    }
+
+
+
+    const file = files[0];
+
+
+
+    // IMPORTANT HEADERS
+    res.set("Content-Type",file.contentType);
+
+    res.set(
+      "Cross-Origin-Resource-Policy",
+      "cross-origin"
+    );
+
+
+
     const downloadStream =
       bucket.openDownloadStream(
         fileId
       );
+
+
 
     downloadStream.on(
       "error",
@@ -97,6 +134,8 @@ exports.getFile =async(req,res) => {
 
       }
     );
+
+
 
     downloadStream.pipe(res);
 

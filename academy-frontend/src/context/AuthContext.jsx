@@ -7,39 +7,35 @@ import {
   useState
 } from "react";
 
+import {
+  getCurrentUser
+} from "@/services/authService";
+
 const AuthContext = createContext();
 
-export const AuthProvider = ({children}) => {
+export const AuthProvider = ({
+  children
+}) => {
 
   const [user,setUser] = useState(null);
   const [loading,setLoading] = useState(true);
 
   const fetchUser = async() => {
+
     try{
 
-      const response = await fetch(
-        "http://localhost:5000/api/auth/me",
-        {
-          credentials:"include"
-        }
-      );
-      // console.log("ME STATUS", response.status);
+      const data = await getCurrentUser();
 
-
-      const data = await response.json();
-        
-      // console.log("ME DATA", data);
-      
-      if(response.ok){
-        setUser(data.user);
-      }else{
-        setUser(null);
-      }
+      setUser(data.user);
 
     }catch(error){
+
       setUser(null);
+
     }finally{
+
       setLoading(false);
+
     }
   };
 
@@ -52,7 +48,8 @@ export const AuthProvider = ({children}) => {
       value={{
         user,
         setUser,
-        loading
+        loading,
+        fetchUser
       }}
     >
       {children}
@@ -60,4 +57,5 @@ export const AuthProvider = ({children}) => {
   );
 };
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () =>
+  useContext(AuthContext);

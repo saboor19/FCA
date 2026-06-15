@@ -15,25 +15,71 @@ const teacherSchema = new mongoose.Schema(
     },
 
     specialization:{
-      type:String
+      type:String,
+      trim:true
     },
 
     qualification:{
-      type:String
+      type:String,
+      trim:true
     },
 
     phone:{
-      type:String
+      type:String,
+      trim:true
     },
 
     address:{
-      type:String
+      type:String,
+      trim:true
     },
 
     joiningDate:{
       type:Date,
       default:Date.now
+    },
+
+
+
+    // PROFILE IMAGE
+    profileImage:{
+      fileId:{
+        type:mongoose.Schema.Types.ObjectId
+      },
+
+      filename:{
+        type:String
+      },
+
+      contentType:{
+        type:String
+      },
+
+      uploadedAt:{
+        type:Date,
+        default:Date.now
+      }
+    },
+
+
+
+    // OPTIONAL EXTRA PROFILE FIELDS
+
+    gender:{
+      type:String,
+      enum:["male","female","other"]
+    },
+
+    bio:{
+      type:String,
+      trim:true
+    },
+
+    experience:{
+      type:Number,
+      default:0
     }
+
   },
   {
     timestamps:true
