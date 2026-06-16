@@ -575,7 +575,7 @@ export default function TeacherSubmissionPage() {
             {/* Bottom CTA */}
             <div className="sticky bottom-6">
               <Link
-                href={`/teacher/submission/${submission._id}/grade`}
+                href={`/teacher/submissions/${submission._id}/grade`}
                 className="flex items-center justify-center gap-2 w-full px-6 py-4 rounded-2xl bg-primary text-primary-foreground font-bold text-base hover:bg-primary-hover transition-all shadow-xl shadow-primary/20 active:scale-[0.98]"
               >
                 <Icons.Edit3 />

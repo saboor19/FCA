@@ -55,6 +55,7 @@ export default function EditAssignmentPage(){
   // ---------------- FETCH DATA ----------------
 
   useEffect(() => {
+    console.log("Fetching batches...");
 
     if(id){
 
@@ -72,49 +73,21 @@ export default function EditAssignmentPage(){
 
     try{
 
-const [
+const data = await getAssignedBatches();
+      setBatches( data.data || []);
 
-  assignmentData,
-
-  batchData
-
-] = await Promise.all([
-
-  getSingleAssignment(id),
-
-  getAssignedBatches()
-
-]);
-
-
-
-setBatches(
-  batchData.data || []
-);;
-
-
+const [ assignmentData] = await Promise.all([getSingleAssignment(id)]);
 
       const assignment =
         assignmentData.assignment;
 
-
-
       setAssignment({
 
         ...assignment,
-
-
-
         batchId:
           assignment.batchId?._id,
-
-
-
         moduleId:
           assignment.moduleId,
-
-
-
         dueDate:
           assignment.dueDate
             ? new Date(
@@ -126,11 +99,7 @@ setBatches(
 
       });
 
-
-
-      setBatches(
-        batchData.batches || []
-      );
+    //  console.log({assignment,batches});
 
     }
     catch(error){

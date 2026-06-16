@@ -12,20 +12,20 @@ require("../../models/Enrollment");
 
 //-------------GET ASSIGNED BATCHES-------------
 exports.getAssignedBatches =
-async(req,res) => {
+async (req, res) => {
 
-  try{
+  try {
 
     const teacher =
       await Teacher.findOne({
-        userId:req.user._id
+        userId: req.user._id
       });
 
-    if(!teacher){
+    if (!teacher) {
 
       return res.status(404).json({
-        success:false,
-        message:"Teacher not found"
+        success: false,
+        message: "Teacher not found"
       });
 
     }
@@ -34,40 +34,85 @@ async(req,res) => {
 
     const timetables =
       await Timetable.find({
-        teacher:teacher._id,
-        isActive:true
+        teacher: teacher._id,
+        isActive: true
       })
-
-      .populate(
-        "batch"
-      )
-
+      .populate("batch")
       .populate(
         "course",
         "title modules"
       )
-
       .lean();
 
-    // REMOVE DUPLICATE BATCHES
+    // GET ALL BATCHES REFERENCED BY TIMETABLES
+
+    const batchIds =
+      timetables.map(
+        slot => slot.batch?._id
+      );
+
+    const batchDocs =
+      await Batch.find({
+        _id: { $in: batchIds }
+      }).lean();
+
+    const batchMap =
+      new Map(
+        batchDocs.map(batch => [
+          batch._id.toString(),
+          batch
+        ])
+      );
+
+    // REMOVE DUPLICATES + FILTER MODULES
 
     const uniqueBatchMap =
       new Map();
 
     timetables.forEach((slot) => {
 
-      if(slot.batch){
+      if (!slot.batch || !slot.course) {
+        return;
+      }
 
-        uniqueBatchMap.set(
-          slot.batch._id.toString(),
-          {
-            ...slot.batch,
-            course:slot.course,
-            subject:slot.subject
-          }
+      const batchDoc =
+        batchMap.get(
+          slot.batch._id.toString()
         );
 
-      }
+      const teacherAssignment =
+        batchDoc?.teacherAssignments?.find(
+          assignment =>
+            assignment.teacher.toString() ===
+            teacher._id.toString()
+        );
+
+      const assignedModuleIds =
+        teacherAssignment?.modules || [];
+
+      const filteredModules =
+        slot.course.modules.filter(
+          module =>
+            assignedModuleIds.some(
+              moduleId =>
+                moduleId.toString() ===
+                module._id.toString()
+            )
+        );
+
+      uniqueBatchMap.set(
+        slot.batch._id.toString(),
+        {
+          ...slot.batch,
+
+          course: {
+            ...slot.course,
+            modules: filteredModules
+          },
+
+          subject: slot.subject
+        }
+      );
 
     });
 
@@ -82,12 +127,12 @@ async(req,res) => {
       await Promise.all(
 
         uniqueBatches.map(
-          async(batch) => {
+          async (batch) => {
 
             const studentsCount =
               await Enrollment.countDocuments({
-                batch:batch._id,
-                status:"ACTIVE"
+                batch: batch._id,
+                status: "ACTIVE"
               });
 
             return {
@@ -100,25 +145,29 @@ async(req,res) => {
 
       );
 
+    console.log(
+      "sending batches",
+      formattedBatches
+    );
+
     res.status(200).json({
-      success:true,
-      count:formattedBatches.length,
-      data:formattedBatches
+      success: true,
+      count: formattedBatches.length,
+      data: formattedBatches
     });
 
-  }catch(error){
+  } catch (error) {
 
     console.log(error);
 
     res.status(500).json({
-      success:false,
-      message:error.message
+      success: false,
+      message: error.message
     });
 
   }
 
 };
-
 
 //-------------GET SINGLE BATCH DETAILS-------------
 exports.getBatchDetails =

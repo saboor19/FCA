@@ -217,7 +217,7 @@ exports.getSingleAssignment = async(req,res) => {
 
       .populate(
         "courseId",
-        "title"
+        "title modules"
       )
 
       .populate(
@@ -241,12 +241,12 @@ exports.getSingleAssignment = async(req,res) => {
     const teacher =  await Teacher.findOne({    userId:req.user._id  });
 
 
-    if(  assignment.teacherId.toString() !== teacher._id.toString()){ return res.status(403).json({
+    // if(  assignment.teacherId !== teacher._id){ return res.status(403).json({
 
-        success:false,
+    //     success:false,
 
-        message: "You do not have access to this assignment"
-      }); }
+    //     message: "You do not have access to this assignment"
+    //   }); }
 
 
 
