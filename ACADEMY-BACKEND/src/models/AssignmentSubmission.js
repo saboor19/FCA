@@ -148,26 +148,18 @@ new mongoose.Schema({
     default:0
   },
 
-
-
   feedback:{
     type:String
   },
-
-
 
   gradedBy:{
     type:mongoose.Schema.Types.ObjectId,
     ref:"Teacher"
   },
 
-
-
   gradedAt:{
     type:Date
   },
-
-
 
   // ---------------- FLAGS ----------------
 

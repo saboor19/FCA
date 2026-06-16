@@ -57,10 +57,10 @@ app.use(limiter);
 
 
 
-//----------------API'S--------------------------------
-// app.use("/api/test", testRoutes);
+//[[[[[[[[[[[[[[[[[[[[[[--API'S--]]]]]]]]]]]]]]]]]]]]]]
 
-//------HOME---------------
+
+//-----------------HOME---------------
 app.get("/", (req, res) => {res.json({message: "Academy API Running" });});
 
 //-------------AUTH ROUTES---------------
@@ -93,7 +93,10 @@ app.use( "/api/teacher/profile", require("./routes/teacher/profileRoutes") );
 app.use("/api/teacher/assignments",require("./routes/teacher/assignmentRoutes") );
 
 //----------------STUDENT ROUTES----------------
- app.use("/api/student/assignments", require("./routes/student/assignmentRoutes"));
+app.use("/api/student/assignments", require("./routes/student/assignmentRoutes"));
+app.use("/api/student/batches",  require("./routes/student/batchRoutes"));
+app.use("/api/student/timetable",require("./routes/student/timetableRoutes"));
+
 
 //----------------image upload routes----------------
 app.use("/api/uploads", require("./routes/uploadRoutes"));

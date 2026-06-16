@@ -321,31 +321,7 @@ const TYPE_CONFIG = {
    MAIN FORM
    ═══════════════════════════════════════════ */
 export default function AssignmentForm({ initialData = {}, onSubmit, loading = false, batches = [] }) {
-  useEffect(() => {
-  setFormData({
-    title: initialData.title || "",
-    description: initialData.description || "",
-    type: initialData.type || "MIXED",
-    batchId: initialData.batchId || "",
-    moduleId: initialData.moduleId || "",
-    instructions: initialData.instructions?.length
-      ? initialData.instructions
-      : [""],
-    dueDate: initialData.dueDate || "",
-    timeLimit: initialData.timeLimit || "",
-    maxAttempts: initialData.maxAttempts || 1,
-    retryDelay: initialData.retryDelay || 0,
-    allowLateSubmission: initialData.allowLateSubmission || false,
-    latePenalty: initialData.latePenalty || 0,
-    autoSubmit: initialData.autoSubmit ?? true,
-    allowResubmission: initialData.allowResubmission || false,
-    shuffleQuestions: initialData.shuffleQuestions || false,
-    showResultImmediately: initialData.showResultImmediately || false,
-    showCorrectAnswers: initialData.showCorrectAnswers || false,
-    requireSafeBrowser: initialData.requireSafeBrowser || false,
-    questions: initialData.questions || [],
-  });
-}, [initialData]);
+
   
   const [formData, setFormData] = useState({
     title: initialData.title || "",
@@ -368,6 +344,9 @@ export default function AssignmentForm({ initialData = {}, onSubmit, loading = f
     requireSafeBrowser: initialData.requireSafeBrowser || false,
     questions: initialData.questions || [],
   });
+
+
+  
 
   const [errors, setErrors] = useState({});
   const [activeTab, setActiveTab] = useState("details");
