@@ -94,7 +94,7 @@ app.use("/api/teacher/assignments",require("./routes/teacher/assignmentRoutes") 
 
 //----------------STUDENT ROUTES----------------
  app.use("/api/student/assignments", require("./routes/student/assignmentRoutes"));
-
+app.use("/api/student/attendance",require("./routes/student/attendanceRoutes"))
 //----------------image upload routes----------------
 app.use("/api/uploads", require("./routes/uploadRoutes"));
 

@@ -84,6 +84,16 @@ const batchSchema = new mongoose.Schema(
     default:30
   },
 
+  
+  attendanceConfig:{
+  latitude:Number,
+  longitude:Number,
+  radius:{
+    type:Number,
+    default:100
+  }
+},
+
   isActive:{
     type:Boolean,
     default:true

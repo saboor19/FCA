@@ -2,6 +2,8 @@ const StudentAttendance = require("../../models/StudentAttendance");
 const TeacherAttendance = require("../../models/TeacherAttendance");
 const Enrollment = require("../../models/Enrollment");
 const Teacher = require("../../models/Teacher");
+const Batch = require("../../models/Batch");
+const LeaveRequest = require("../../models/LeaveRequest");
 
 const VALID_STATUSES = [
   "PRESENT",
@@ -502,6 +504,298 @@ exports.getStudentAttendance = async(req,res) => {
     res.status(500).json({
       success:false,
       message:error.message
+    });
+
+  }
+
+};
+
+exports.getAllLeaveRequests =
+async(req,res) => {
+
+  try{
+
+    const requests =
+      await LeaveRequest.find()
+      .populate({
+        path:"student",
+        populate:{
+          path:"userId",
+          select:"fullName email"
+        }
+      })
+      .populate(
+        "teacherReviewedBy",
+        "fullName"
+      )
+      .populate(
+        "adminReviewedBy",
+        "fullName"
+      )
+      .sort({
+        createdAt:-1
+      });
+
+    return res.status(200).json({
+
+      success:true,
+
+      requests
+
+    });
+
+  }
+
+  catch(error){
+
+    return res.status(500).json({
+
+      success:false,
+
+      message:error.message
+
+    });
+
+  }
+
+};
+
+exports.approveLeaveRequest = async(req,res) => {
+
+  try{
+
+    const {leaveId} =
+      req.params;
+
+    const leave =
+      await LeaveRequest.findById(
+        leaveId
+      );
+
+    if(!leave){
+
+      return res.status(404).json({
+        success:false,
+        message:"Leave request not found"
+      });
+
+    }
+
+    if(
+      leave.teacherStatus !==
+      "APPROVED"
+    ){
+
+      return res.status(400).json({
+        success:false,
+        message:
+        "Teacher approval pending"
+      });
+
+    }
+
+    leave.adminStatus =
+      "APPROVED";
+
+    leave.adminReviewedBy =
+      req.user._id;
+
+    await leave.save();
+
+    return res.status(200).json({
+
+      success:true,
+
+      message:
+      "Leave approved successfully"
+
+    });
+
+  }
+
+  catch(error){
+
+    return res.status(500).json({
+
+      success:false,
+
+      message:error.message
+
+    });
+
+  }
+
+};
+
+exports.rejectLeaveRequest = async(req,res) => {
+
+  try{
+
+    const {leaveId} =
+      req.params;
+
+    const {remarks} =
+      req.body;
+
+    const leave =
+      await LeaveRequest.findById(
+        leaveId
+      );
+
+    if(!leave){
+
+      return res.status(404).json({
+        success:false,
+        message:"Leave request not found"
+      });
+
+    }
+
+    leave.adminStatus =
+      "REJECTED";
+
+    leave.adminReviewedBy =
+      req.user._id;
+
+    leave.remarks =
+      remarks;
+
+    await leave.save();
+
+    return res.status(200).json({
+
+      success:true,
+
+      message:"Leave rejected"
+
+    });
+
+  }
+
+  catch(error){
+
+    return res.status(500).json({
+
+      success:false,
+
+      message:error.message
+
+    });
+
+  }
+
+};
+
+exports.updateBatchAttendanceLocation =
+async(req,res) => {
+
+  try{
+
+    const {batchId} =
+      req.params;
+
+    const {
+      latitude,
+      longitude,
+      radius
+    } = req.body;
+
+    const batch =
+      await Batch.findById(
+        batchId
+      );
+
+    if(!batch){
+
+      return res.status(404).json({
+        success:false,
+        message:"Batch not found"
+      });
+
+    }
+
+    batch.attendanceConfig = {
+
+      latitude,
+      longitude,
+      radius
+
+    };
+
+    await batch.save();
+
+    return res.status(200).json({
+
+      success:true,
+
+      message:
+      "Attendance location updated",
+
+      attendanceConfig:
+      batch.attendanceConfig
+
+    });
+
+  }
+
+  catch(error){
+
+    return res.status(500).json({
+
+      success:false,
+
+      message:error.message
+
+    });
+
+  }
+
+};
+
+exports.getBatchAttendanceConfig =
+async(req,res) => {
+
+  try{
+
+    const {batchId} =
+      req.params;
+
+    const batch =
+      await Batch.findById(
+        batchId
+      );
+
+    if(!batch){
+
+      return res.status(404).json({
+
+        success:false,
+
+        message:"Batch not found"
+
+      });
+
+    }
+
+    return res.status(200).json({
+
+      success:true,
+
+      attendanceConfig:
+      batch.attendanceConfig || null
+
+    });
+
+  }
+
+  catch(error){
+
+    return res.status(500).json({
+
+      success:false,
+
+      message:error.message
+
     });
 
   }

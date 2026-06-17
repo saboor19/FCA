@@ -13,7 +13,12 @@ const {
   getBatchAttendance,
   updateStudentAttendance,
   markTeacherAttendance,
-  getTeacherAttendance,getStudentAttendance
+  getTeacherAttendance,getStudentAttendance,
+    getAllLeaveRequests,
+  approveLeaveRequest,
+  rejectLeaveRequest,
+  updateBatchAttendanceLocation,
+  getBatchAttendanceConfig
 
 } = require(
   "../../controllers/admin/attendanceController"
@@ -56,6 +61,30 @@ router.get(
 router.post(
   "/teachers",
   markTeacherAttendance
+);
+
+router.get(
+  "/leaves",
+  getAllLeaveRequests
+);
+
+router.put(
+  "/leaves/:leaveId/approve",
+  approveLeaveRequest
+);
+
+router.put(
+  "/leaves/:leaveId/reject",
+  rejectLeaveRequest
+);
+
+router.put(
+  "/batches/:batchId/location",
+  updateBatchAttendanceLocation
+);
+router.get(
+  "/batches/:batchId/location",
+  getBatchAttendanceConfig
 );
 
 module.exports = router;

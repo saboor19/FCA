@@ -31,3 +31,42 @@ async(data) => {
   return response.data;
 
 };
+export const getPendingLeaves =
+async() => {
+
+  const response =
+    await api.get(
+      "/teacher/attendance/leaves/pending"
+    );
+
+  return response.data;
+
+};
+
+export const approveLeave =
+async(leaveId) => {
+
+  const response =
+    await api.put(
+      `/teacher/attendance/leaves/${leaveId}/approve`
+    );
+
+  return response.data;
+
+};
+
+export const rejectLeave =
+async(
+  leaveId,
+  remarks
+) => {
+
+  const response =
+    await api.put(
+      `/teacher/attendance/leaves/${leaveId}/reject`,
+      {remarks}
+    );
+
+  return response.data;
+
+};
