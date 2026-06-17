@@ -1,14 +1,25 @@
+const User=require("../../models/User");
+
 const Teacher =
 require("../../models/Teacher");
-
-const Batch =
-require("../../models/Batch");
 
 const Timetable =
 require("../../models/Timetable");
 
 const Enrollment =
 require("../../models/Enrollment");
+
+const Course =
+require("../../models/Course");
+
+const Batch =
+require("../../models/Batch");
+
+
+const Student=
+require("../../models/Student");
+
+
 
 //-------------GET ASSIGNED BATCHES-------------
 exports.getAssignedBatches =
@@ -193,7 +204,6 @@ async(req,res) => {
       await Batch.findById(
         req.params.id
       )
-
       .populate(
         "course",
         "title modules description"
@@ -239,15 +249,13 @@ async(req,res) => {
       })
 
      .populate({
-  path:"student",
-  populate:{
-    path:"userId",
-    select:"fullName email"
-  }
-})
-.populate("course")
+        path:"student",
+          populate:{
+            path:"userId",
+            select:"fullName email"
+      }}).lean();
 
-      .lean();
+      
 
     res.status(200).json({
       success:true,

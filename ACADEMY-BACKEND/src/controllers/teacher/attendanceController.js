@@ -15,6 +15,14 @@ require("../../models/AttendanceSession");
 
 const generateAttendanceCode =
 require("../../utils/generateAttendanceCode");
+const processApprovedLeave =
+require("../../utils/processApprovedLeave");
+
+const LeaveRequest=require("../../models/LeaveRequest")
+
+// console.log("ATTENDANCESESSION MODEL IS :",AttendanceSession);
+
+const Batch =require("../../models/Batch")
 
 const VALID_STATUSES = [
   "PRESENT",
@@ -411,10 +419,11 @@ async(req,res) => {
 
     }
 
-    const batch =
-      await Batch.findById(
-        batchId
-      );
+    
+      console.log("this is bacth sent by teacher for attendannce", batchId)
+
+    const batch = await Batch.findById(batchId);
+    console.log(batch);
 
     if(!batch){
 
@@ -568,12 +577,16 @@ async(req,res) => {
       });
 
     }
+    console.log("teacher  found ",teacher);
 
     const batches =
       await Batch.find({
         "teacherAssignments.teacher":
         teacher._id
       });
+
+      
+    console.log("batches  found ",teacher);
 
     const batchIds =
       batches.map(
@@ -586,9 +599,7 @@ async(req,res) => {
         batch:{
           $in:batchIds
         },
-
-        status:"PENDING"
-
+        teacherStatus:"PENDING"
       })
       .populate({
         path:"student",
@@ -600,6 +611,9 @@ async(req,res) => {
       .sort({
         createdAt:-1
       });
+
+      
+    console.log("requests  found ",requests);
 
     return res.status(200).json({
 
@@ -726,6 +740,12 @@ leave.teacherReviewedBy =
   req.user._id;
 
     await leave.save();
+
+
+    if(leave.teacherStatus ==="APPROVED" && leave.adminStatus ==="APPROVED"){
+      await processApprovedLeave(leave);
+      }
+
 
     return res.status(200).json({
 

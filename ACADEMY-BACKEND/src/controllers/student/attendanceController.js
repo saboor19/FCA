@@ -284,6 +284,8 @@ async(req,res) => {
       longitude
     } = req.body;
 
+    console.log("Provided coordiates: ", latitude,longitude)
+
     const student =
       await Student.findOne({
         userId:req.user._id
@@ -351,6 +353,11 @@ async(req,res) => {
         batch.attendanceConfig.longitude
 
       );
+
+      console.log( "distance is : ", distance);
+      console.log( "batch attendance config is  : ", batch.attendanceConfig.latitude,
+        batch.attendanceConfig.longitude);
+      
 
     if(
       distance >
@@ -788,6 +795,72 @@ async(req,res) => {
         }
 
       }
+
+    });
+
+  }
+
+  catch(error){
+
+    console.error(error);
+
+    return res.status(500).json({
+
+      success:false,
+
+      message:error.message
+
+    });
+
+  }
+
+};
+
+exports.getCurrentBatch =
+async(req,res) => {
+
+  try{
+
+    const student =
+      await Student.findOne({
+        userId:req.user._id
+      });
+
+    if(!student){
+
+      return res.status(404).json({
+        success:false,
+        message:"Student not found"
+      });
+
+    }
+
+    const enrollment =
+      await Enrollment.findOne({
+        student:student._id,
+        status:"ACTIVE"
+      })
+      .populate({
+        path:"batch",
+        select:
+        "name studyMode course"
+      });
+
+    if(!enrollment){
+
+      return res.status(404).json({
+        success:false,
+        message:"No active enrollment found"
+      });
+
+    }
+
+    return res.status(200).json({
+
+      success:true,
+
+      batch:
+      enrollment.batch
 
     });
 

@@ -4,6 +4,7 @@ const router =
   express.Router();
 
 const {
+  getCurrentBatch,
   getMyAttendance,
   getAttendanceStats,
   getAttendanceOverview,
@@ -58,6 +59,11 @@ router.post(
 router.get(
   "/leaves",
   getMyLeaveRequests
+);
+
+router.get(
+  "/batch",
+  getCurrentBatch
 );
 
 module.exports =

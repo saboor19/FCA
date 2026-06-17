@@ -15,7 +15,11 @@ import {
   Phone,
   Shield
 } from "lucide-react";
+import BatchSettingsCard
+from "@/components/admin/batches/BatchSettingsCard";
 
+import EditBatchModal
+from "@/components/admin/batches/EditBatchModal";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import AcademyLoader from "@/components/ui/AcademyLoader";
 import AssignStudentsModal from "@/components/batches/AssignStudentsModal";
@@ -26,7 +30,7 @@ import ManageFeeModal from "@/components/fees/ManageFeeModal";
 export default function BatchDetailsPage() {
   const params = useParams();
   const batchId = params.id;
-
+  const [editOpen,setEditOpen] =useState(false);
   const [batch, setBatch] = useState(null);
   const [students, setStudents] = useState([]);
   const [studentCount, setStudentCount] = useState(0);
@@ -181,6 +185,10 @@ const toggleAllTeachers = () => {
             </div>
           </div>
         </div>
+
+        <BatchSettingsCard
+        batch={batch}
+        onEdit={() =>setEditOpen(true)}/>
 
         {/* -------------------------------------------------------TEACHERS------------------------------- */}
         <div className="bg-card border border-border-custom rounded-2xl p-6 shadow-sm">
@@ -459,6 +467,11 @@ batch.teacherAssignments.map(
           )}
         </div>
       </div>
+
+      <EditBatchModal
+        open={editOpen}
+        onClose={() =>setEditOpen(false)}batch={batch}
+        refreshBatch={fetchBatch}/>
 
       <AssignStudentsModal
         open={openModal}

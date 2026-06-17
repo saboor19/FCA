@@ -4,6 +4,7 @@ const Enrollment = require("../../models/Enrollment");
 const Teacher = require("../../models/Teacher");
 const Batch = require("../../models/Batch");
 const LeaveRequest = require("../../models/LeaveRequest");
+const processApprovedLeave = require("../../utils/processApprovedLeave");
 
 const VALID_STATUSES = [
   "PRESENT",
@@ -601,6 +602,10 @@ exports.approveLeaveRequest = async(req,res) => {
       req.user._id;
 
     await leave.save();
+
+    if(leave.teacherStatus ==="APPROVED" && leave.adminStatus ==="APPROVED"){
+      await processApprovedLeave(leave);
+      }
 
     return res.status(200).json({
 

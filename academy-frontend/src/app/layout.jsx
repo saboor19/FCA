@@ -3,6 +3,7 @@ import AppNavbar from "@/components/public/AppNavbar";
 import {Providers} from "@/components/providers";
 import {AuthProvider} from "@/context/AuthContext";
 import Footer from "@/components/public/Footer";
+import "leaflet/dist/leaflet.css";
 export const metadata = {
   title:"Academy Web App",
   description:"Modern academy management platform"

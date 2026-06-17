@@ -112,8 +112,8 @@ export default function LeavePage(){
 
   return (
 
-    <DashboardLayout>
-
+    <DashboardLayout role="STUDENT">
+ 
       <div className="space-y-6">
 
         <div className="rounded-xl border p-6">

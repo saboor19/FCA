@@ -44,6 +44,20 @@ export const assignStudents = async (
 };
 
 
+export const updateBatch =
+async(id,data) => {
+
+  const response =
+    await api.put(
+      `/batches/${id}`,
+      data
+    );
+
+  return response.data;
+
+};
+
+
 export const assignTeachers =
   async(batchId,data) => {
 

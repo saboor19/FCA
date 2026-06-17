@@ -18,7 +18,7 @@ import {
   Monitor,
   CheckCircle,
 } from "lucide-react";
-
+import AttendanceLocationPicker from "@/components/admin/batches/AttendanceLocationPicker";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import api from "@/lib/api";
 import { createBatch } from "@/services/admin/batchService";
@@ -29,6 +29,7 @@ export default function CreateBatchPage() {
   const [teachers, setTeachers] = useState([]);
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [ attendanceConfig,  setAttendanceConfig] = useState({  latitude:null,  longitude:null,  radius:100});
   const [formData, setFormData] = useState({
     name: "",
     course: "",
@@ -105,52 +106,99 @@ export default function CreateBatchPage() {
     setFormData({ ...formData, teacherAssignments: updated });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  // Validation
+  if (!formData.name.trim()) {
+    toast.error("Batch name is required");
+    return;
+  }
+  if (!formData.course) {
+    toast.error("Please select a course");
+    return;
+  }
+  if (
+    new Date(formData.startDate) >=
+    new Date(formData.endDate)
+  ) {
+    toast.error(
+      "End date must be after start date"
+    );
+    return;
+  }
+  if (formData.capacity < 1) {
+    toast.error(
+      "Capacity must be at least 1"
+    );
+    return;
+  }
+  if (
+    formData.studyMode === "ONLINE" && !formData.meetingLink.trim()
+  ) { toast.error(
+      "Meeting link is required for online mode"
+    );
+    return;
+  }
+  if (
+    formData.studyMode === "OFFLINE" && !formData.roomNumber.trim()
+  ) {
+    toast.error(
+      "Room number is required for offline mode"
+    );
+    return;
 
-    // Validation
-    if (!formData.name.trim()) {
-      toast.error("Batch name is required");
-      return;
-    }
-    if (!formData.course) {
-      toast.error("Please select a course");
-      return;
-    }
-    if (new Date(formData.startDate) >= new Date(formData.endDate)) {
-      toast.error("End date must be after start date");
-      return;
-    }
-    if (formData.capacity < 1) {
-      toast.error("Capacity must be at least 1");
-      return;
-    }
-    if (formData.studyMode === "ONLINE" && !formData.meetingLink.trim()) {
-      toast.error("Meeting link is required for online mode");
-      return;
-    }
-    if (formData.studyMode === "OFFLINE" && !formData.roomNumber.trim()) {
-      toast.error("Room number is required for offline mode");
-      return;
-    }
+  }
 
-    const cleanedAssignments = formData.teacherAssignments.filter(
-      (a) => a.teacher && a.modules.length > 0
+  // Attendance Location Validation
+
+  if (
+    (formData.studyMode === "OFFLINE" ||
+      formData.studyMode === "HYBRID") &&
+    (
+      !attendanceConfig.latitude ||
+      !attendanceConfig.longitude
+    )
+  ) {
+
+    toast.error(
+      "Please select attendance location on map"
     );
 
-    try {
-      setLoading(true);
-      await createBatch({ ...formData, teacherAssignments: cleanedAssignments });
-      toast.success("Batch created successfully!");
-      router.push("/admin/batches");
-    } catch (error) {
-      console.error(error);
-      toast.error(error.response?.data?.message || "Something went wrong");
-    } finally {
-      setLoading(false);
-    }
-  };
+    return;
 
+  }
+
+  const cleanedAssignments =
+    formData.teacherAssignments.filter(
+
+      (assignment) =>
+        assignment.teacher &&assignment.modules.length > 0
+    );
+  try {
+    setLoading(true);
+    await createBatch({...formData,teacherAssignments:cleanedAssignments, attendanceConfig});
+    toast.success(
+      "Batch created successfully!"
+    );
+
+    router.push(
+      "/admin/batches"
+    );
+
+  }
+
+  catch (error) {
+    console.error(error);
+    toast.error(
+      error.response?.data?.message ||
+      "Something went wrong"
+    );
+  }
+  finally {
+    setLoading(false);
+  }
+
+};
   // Styling (theme‑aware)
   const inputStyle =
     "w-full px-4 py-2.5 rounded-xl border border-border-custom bg-card text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all";
@@ -434,6 +482,12 @@ export default function CreateBatchPage() {
               ))}
             </div>
           </div>
+
+          {( formData.studyMode === "OFFLINE" || formData.studyMode === "HYBRID" ) && (
+              <AttendanceLocationPicker
+                  attendanceConfig={attendanceConfig}
+                  setAttendanceConfig={setAttendanceConfig}
+              />)}
 
           {/* Submit button */}
           <div className="sticky bottom-4 z-10">

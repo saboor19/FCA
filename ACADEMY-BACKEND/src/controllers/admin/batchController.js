@@ -12,24 +12,16 @@ exports.createBatch = async (req,res, next) => {
   try{
 
     const {
-
       name,
-
       course,
-
       teacherAssignments,
-
       studyMode,
-
       roomNumber,
-
       meetingLink,
-
       startDate,
-
       endDate,
-
-      capacity
+      capacity,
+      attendanceConfig
 
     } = req.body;
 
@@ -125,7 +117,9 @@ exports.createBatch = async (req,res, next) => {
 
         endDate,
 
-        capacity
+        capacity,
+        
+        attendanceConfig
 
       });
 
@@ -186,7 +180,8 @@ exports.getBatch = async(req,res,next) => {
 
     const batch =
       await Batch.findById(req.params.id)
-      .populate("course","title modules").populate({
+      .populate("course","title modules")
+      .populate({
       path:"teacherAssignments.teacher",
 
       populate:{
@@ -230,9 +225,10 @@ const students =
 
 };
 
-//--------------UDATE BACTH----------
+//--------------UDATE BATCH----------
 
-exports.updateBatch = async(req,res,next) => {
+exports.updateBatch =
+async(req,res,next) => {
 
   try{
 
@@ -251,12 +247,106 @@ exports.updateBatch = async(req,res,next) => {
 
     }
 
+    const updateData = {
+
+      name:req.body.name,
+
+      studyMode:req.body.studyMode,
+
+      roomNumber:req.body.roomNumber,
+
+      meetingLink:req.body.meetingLink,
+
+      startDate:req.body.startDate,
+
+      endDate:req.body.endDate,
+
+      capacity:req.body.capacity,
+
+      attendanceConfig:
+        req.body.attendanceConfig
+
+    };
+
+    Object.keys(updateData)
+      .forEach((key) => {
+
+        if(
+          updateData[key] ===
+          undefined
+        ){
+
+          delete updateData[key];
+
+        }
+
+      });
+
+      if(
+  req.body.studyMode ===
+  "HYBRID"
+){
+
+  if(
+    !req.body.roomNumber ||
+    !req.body.meetingLink
+  ){
+
+    res.status(400);
+
+    throw new Error(
+
+      "Hybrid batches require room number and meeting link"
+
+    );
+
+  }
+
+}
+
+
+//-----------------location config validation------------
+if(
+  req.body.attendanceConfig
+){
+
+  const {
+
+    latitude,
+
+    longitude,
+
+    radius
+
+  } =
+  req.body.attendanceConfig;
+
+  if(
+
+    latitude === undefined ||
+
+    longitude === undefined ||
+
+    radius === undefined
+
+  ){
+
+    res.status(400);
+
+    throw new Error(
+      "Invalid attendance configuration"
+    );
+
+  }
+
+}
+
     const updatedBatch =
       await Batch.findByIdAndUpdate(
 
         req.params.id,
 
-        req.body,
+        updateData,
 
         {
           new:true,
@@ -294,14 +384,15 @@ exports.updateBatch = async(req,res,next) => {
 
     });
 
-  }catch(error){
+  }
+
+  catch(error){
 
     next(error);
 
   }
 
 };
-
 //-------------- DELETE BATCHES-------------
 exports.deleteBatch = async(req,res,next) => {
 

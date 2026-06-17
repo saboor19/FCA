@@ -359,6 +359,7 @@ export default function TeacherBatchDetailsPage(){
                 batch.students?.length > 0 ? (
 
                   batch.students.map((student) => (
+                    
 
                     <div
                       key={student._id}

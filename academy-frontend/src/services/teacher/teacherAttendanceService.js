@@ -70,3 +70,40 @@ async(
   return response.data;
 
 };
+
+export const createAttendanceSession =
+async(batchId) => {
+
+  const response =
+    await api.post(
+      "/teacher/attendance/session",
+      {batchId}
+    );
+
+  return response.data;
+
+};
+
+export const getActiveAttendanceSession =
+async(batchId) => {
+
+  const response =
+    await api.get(
+      `/teacher/attendance/session/${batchId}`
+    );
+
+  return response.data;
+
+};
+
+export const closeAttendanceSession =
+async(sessionId) => {
+
+  const response =
+    await api.put(
+      `/teacher/attendance/session/${sessionId}/close`
+    );
+
+  return response.data;
+
+};

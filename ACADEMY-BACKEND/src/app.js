@@ -93,16 +93,16 @@ app.use( "/api/teacher/profile", require("./routes/teacher/profileRoutes") );
 app.use("/api/teacher/assignments",require("./routes/teacher/assignmentRoutes") );
 
 //----------------STUDENT ROUTES----------------
-<<<<<<< HEAD
+
  app.use("/api/student/assignments", require("./routes/student/assignmentRoutes"));
 app.use("/api/student/attendance",require("./routes/student/attendanceRoutes"))
-=======
+
 app.use("/api/student/assignments", require("./routes/student/assignmentRoutes"));
 app.use("/api/student/batches",  require("./routes/student/batchRoutes"));
 app.use("/api/student/timetable",require("./routes/student/timetableRoutes"));
 
 
->>>>>>> 9223550e97a7ada23634dfc0a8f3cd3dd7b14d69
+
 //----------------image upload routes----------------
 app.use("/api/uploads", require("./routes/uploadRoutes"));
 

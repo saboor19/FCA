@@ -73,3 +73,15 @@ async() => {
   return response.data;
 
 };
+
+export const getCurrentBatch =
+async() => {
+
+  const response =
+    await api.get(
+      "/student/attendance/batch"
+    );
+
+  return response.data;
+
+};
