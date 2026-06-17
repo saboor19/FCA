@@ -89,7 +89,7 @@ exports.createAssignment = async(req,res) => {
 totalMarks =
   questions.reduce(
     (acc,question) =>
-      acc + (question.marks || 0),
+      acc + Number(question.marks || 0),
     0
   );
 }
@@ -742,7 +742,10 @@ await AssignmentSubmission.find({
 
 .populate({
   path:"studentId",
-  select:"fullName email profileImage"
+    populate:{
+    path:"userId",
+    select:"fullName email profileImage"
+  }
 })
 
 .populate({
@@ -763,8 +766,18 @@ submissions.map(
     _id:
       submission._id,
 
-    student:
-      submission.studentId,
+  student:{
+    _id:submission.studentId._id,
+    fullName:
+      submission.studentId.userId?.fullName,
+    email:
+      submission.studentId.userId?.email,
+    profileImage:
+      submission.studentId.userId?.profileImage,
+    enrollmentNo:
+      submission.studentId.enrollmentNo
+  },
+  
 
     status:
       submission.status,
@@ -789,6 +802,9 @@ submissions.map(
 
   })
 );
+
+
+
 
     return res.status(200).json({
 
