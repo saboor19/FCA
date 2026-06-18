@@ -10,44 +10,51 @@ export default function AttendanceStats({ stats }) {
     leave: 0
   });
 
+  // console.log("this is stats from stats card: ",stats);
+
   const hasAnimated = useRef(false);
 
   // Animate numbers on mount
-  useEffect(() => {
-    if (!stats || hasAnimated.current) return;
-    hasAnimated.current = true;
+ useEffect(() => {
+  if (!stats) return;
 
-    const duration = 800;
-    const steps = 30;
-    const interval = duration / steps;
+  const duration = 800;
+  const steps = 30;
+  const interval = duration / steps;
 
-    const targets = {
-      percentage: stats?.percentage || 0,
-      total: stats?.total || 0,
-      present: stats?.present || 0,
-      absent: stats?.absent || 0,
-      leave: stats?.leave || 0
-    };
+  const targets = {
+    percentage: stats.percentage || 0,
+    total: stats.total || 0,
+    present: stats.present || 0,
+    absent: stats.absent || 0,
+    leave: stats.leave || 0
+  };
 
-    let step = 0;
-    const timer = setInterval(() => {
-      step++;
-      const progress = step / steps;
-      const easeOut = 1 - Math.pow(1 - progress, 3); // Cubic ease-out
+  let step = 0;
 
-      setAnimatedStats({
-        percentage: Math.round(targets.percentage * easeOut),
-        total: Math.round(targets.total * easeOut),
-        present: Math.round(targets.present * easeOut),
-        absent: Math.round(targets.absent * easeOut),
-        leave: Math.round(targets.leave * easeOut)
-      });
+  const timer = setInterval(() => {
+    step++;
 
-      if (step >= steps) clearInterval(timer);
-    }, interval);
+    const progress = step / steps;
+    const easeOut = 1 - Math.pow(1 - progress, 3);
 
-    return () => clearInterval(timer);
-  }, [stats]);
+    setAnimatedStats({
+      percentage: Math.round(targets.percentage * easeOut),
+      total: Math.round(targets.total * easeOut),
+      present: Math.round(targets.present * easeOut),
+      absent: Math.round(targets.absent * easeOut),
+      leave: Math.round(targets.leave * easeOut)
+    });
+
+    if (step >= steps) {
+      clearInterval(timer);
+
+      setAnimatedStats(targets);
+    }
+  }, interval);
+
+  return () => clearInterval(timer);
+}, [stats]);
 
   const percentage = stats?.percentage || 0;
   

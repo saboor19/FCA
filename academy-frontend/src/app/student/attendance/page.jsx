@@ -19,7 +19,7 @@ from "@/components/students/attendance/AttendanceActions";
 
 import {
   getAttendanceOverview,
-  getAttendance
+  getAttendance,getAttendanceStats
 }
 from "@/services/student/attendanceService";
 
@@ -62,6 +62,7 @@ export default function AttendancePage(){
       setAttendance(
         attendanceResponse.attendance || []
       );
+     
 
     }
 
@@ -78,6 +79,7 @@ export default function AttendancePage(){
     }
 
   };
+   console.log("this is overview ", overview);
 
   if(loading){
 

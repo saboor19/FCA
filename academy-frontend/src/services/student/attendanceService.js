@@ -23,6 +23,17 @@ async() => {
   return response.data;
 
 };
+export const getAttendanceStats =
+async() => {
+
+  const response =
+    await api.get(
+      "/student/attendance/stats"
+    );
+
+  return response.data;
+
+};
 
 export const submitLeaveRequest =
 async(data) => {

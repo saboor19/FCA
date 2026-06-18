@@ -3,7 +3,7 @@ import { Clock, CheckCircle2, XCircle, FileText, ArrowRight } from "lucide-react
 
 export default function LeaveSummary({ leaveRequests }) {
   const [animated, setAnimated] = useState({ pending: 0, approved: 0, rejected: 0 });
-  const hasAnimated = useRef(false);
+  // const hasAnimated = useRef(false);
 
   const stats = {
     pending: leaveRequests?.pending || 0,
@@ -14,8 +14,8 @@ export default function LeaveSummary({ leaveRequests }) {
 
   // Animate numbers on mount
   useEffect(() => {
-    if (hasAnimated.current) return;
-    hasAnimated.current = true;
+    // if (hasAnimated.current) return;
+    // hasAnimated.current = true;
 
     const duration = 700;
     const steps = 25;
