@@ -176,17 +176,33 @@ exports.getBatchAttendance = async(req,res) => {
         }
       })
       .lean();
+      console.log(
+  enrollments.map(e => e._id.toString())
+);
 
-    const attendanceRecords =
-      await StudentAttendance.find({
-        enrollment:{
-          $in:enrollments.map(
-            enrollment => enrollment._id
-          )
-        },
-        date:normalizedDate
-      })
-      .lean();
+const nextDay =
+  new Date(normalizedDate);
+
+nextDay.setDate(
+  nextDay.getDate() + 1
+);
+
+const attendanceRecords =
+  await StudentAttendance.find({
+
+    enrollment:{
+      $in:enrollments.map(
+        enrollment => enrollment._id
+      )
+    },
+
+    date:{
+      $gte:normalizedDate,
+      $lt:nextDay
+    }
+
+  })
+  .lean();
 
     const formattedData =
       enrollments.map((enrollment) => {
@@ -197,6 +213,8 @@ exports.getBatchAttendance = async(req,res) => {
               ===
               enrollment._id.toString()
           );
+
+          
 
         return {
           attendanceId:

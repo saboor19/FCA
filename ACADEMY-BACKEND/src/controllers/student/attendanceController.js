@@ -361,10 +361,6 @@ async(req,res) => {
 
       );
 
-      console.log( "distance is : ", distance);
-      console.log( "batch attendance config is  : ", batch.attendanceConfig.latitude,
-        batch.attendanceConfig.longitude);
-      
 
     if(
       distance >
@@ -409,18 +405,24 @@ const existing =
 
     }
 
-    const attendance =
-      await StudentAttendance.create({
+const attendanceDate = new Date();
 
-        enrollment:enrollment._id,
+attendanceDate.setHours(
+  0,0,0,0
+);
 
-        markedBy:req.user._id,
+const attendance =
+  await StudentAttendance.create({
 
-        date:new Date(),
+    enrollment:enrollment._id,
 
-        status:"PRESENT"
+    markedBy:req.user._id,
 
-      });
+    date:attendanceDate,
+
+    status:"PRESENT"
+
+  });
 
     await AttendanceLog.create({
 
