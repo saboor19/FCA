@@ -4,6 +4,21 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import { getStudent, updateStudent } from "@/services/admin/studentService";
+import {
+  User,
+  Mail,
+  Phone,
+  MapPin,
+  Users,
+  Calendar,
+  Lock,
+  Eye,
+  EyeOff,
+  Save,
+  ArrowLeft,
+  Loader2,
+  ShieldCheck
+} from "lucide-react";
 
 export default function EditStudentPage() {
   const { id } = useParams();
@@ -11,6 +26,7 @@ export default function EditStudentPage() {
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -20,6 +36,7 @@ export default function EditStudentPage() {
     guardianName: "",
     guardianPhone: "",
     dateOfBirth: "",
+    password: "",
   });
 
   useEffect(() => {
@@ -38,9 +55,8 @@ export default function EditStudentPage() {
         address: student.address || "",
         guardianName: student.guardianName || "",
         guardianPhone: student.guardianPhone || "",
-        dateOfBirth: student.dateOfBirth
-          ? student.dateOfBirth.split("T")[0]
-          : "",
+        dateOfBirth: student.dateOfBirth ? student.dateOfBirth.split("T")[0] : "",
+        password: "",
       });
     } catch (error) {
       console.error(error);
@@ -61,7 +77,12 @@ export default function EditStudentPage() {
 
     try {
       setSaving(true);
-      await updateStudent(id, formData);
+      // Only send password if user entered a new one
+      const payload = { ...formData };
+      if (!payload.password || payload.password.trim() === "") {
+        delete payload.password;
+      }
+      await updateStudent(id, payload);
       router.push("/admin/students");
     } catch (error) {
       alert(error.response?.data?.message || "Failed to update student");
@@ -74,101 +95,214 @@ export default function EditStudentPage() {
     return (
       <DashboardLayout role="ADMIN">
         <div className="flex min-h-[400px] items-center justify-center">
-          <p className="text-slate-500 dark:text-slate-400">Loading student data...</p>
+          <div className="flex items-center gap-3 text-[var(--muted-foreground)]">
+            <Loader2 className="w-5 h-5 animate-spin" />
+            <span className="text-sm font-medium">Loading student data...</span>
+          </div>
         </div>
       </DashboardLayout>
     );
   }
 
-  // Base input styling for consistency across text inputs and textareas
-  const inputStyles = "w-full border border-border-custom bg-transparent text-foreground placeholder:text-slate-400 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-shadow";
+  const inputBase =
+    "w-full rounded-xl border border-[var(--border)] bg-[var(--card)] text-[var(--foreground)] " +
+    "placeholder:text-[var(--muted-foreground)]/60 px-4 py-3 pl-11 " +
+    "focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/30 focus:border-[var(--primary)]/50 " +
+    "transition-all duration-200";
+
+  const sectionTitle = "text-xs font-bold uppercase tracking-wider text-[var(--muted-foreground)] mb-4";
 
   return (
     <DashboardLayout role="ADMIN">
-      <div className="max-w-4xl">
-        <h1 className="text-3xl font-bold mb-2 text-foreground">
-          Edit Student
-        </h1>
-        <p className="text-slate-500 dark:text-slate-400 mb-8">
-          Update student details.
-        </p>
+      <div className="max-w-4xl mx-auto space-y-6">
+        {/* Header */}
+        <div className="flex items-start justify-between">
+          <div>
+            <button
+              onClick={() => router.push("/admin/students")}
+              className="inline-flex items-center gap-2 text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors mb-4 group"
+            >
+              <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
+              Back to Students
+            </button>
+            <h1 className="text-3xl font-bold text-[var(--foreground)] tracking-tight">
+              Edit Student
+            </h1>
+            <p className="text-sm text-[var(--muted-foreground)] mt-1">
+              Update student profile and account details.
+            </p>
+          </div>
+        </div>
 
         <form
           onSubmit={handleSubmit}
-          className="bg-card border border-border-custom rounded-2xl p-6 space-y-6 shadow-sm"
+          className="space-y-8"
         >
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <input
-              type="text"
-              name="name"
-              placeholder="Full Name"
-              value={formData.name} // Fixed from formData.fullName to match state
-              onChange={handleChange}
-              className={inputStyles}
-            />
+          {/* Personal Information */}
+          <div className="rounded-2xl border border-[var(--border)] bg-[var(--card)] p-6 shadow-sm">
+            <h2 className={sectionTitle}>Personal Information</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              {/* Full Name */}
+              <div className="relative">
+                <User className="absolute left-3.5 top-3.5 w-4.5 h-4.5 text-[var(--muted-foreground)]" />
+                <input
+                  type="text"
+                  name="name"
+                  placeholder="Full Name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  className={inputBase}
+                  required
+                />
+              </div>
 
-            <input
-              type="email"
-              name="email"
-              placeholder="Email"
-              value={formData.email}
-              onChange={handleChange}
-              className={inputStyles}
-            />
+              {/* Email */}
+              <div className="relative">
+                <Mail className="absolute left-3.5 top-3.5 w-4.5 h-4.5 text-[var(--muted-foreground)]" />
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="Email Address"
+                  value={formData.email}
+                  onChange={handleChange}
+                  className={inputBase}
+                  required
+                />
+              </div>
 
-            <input
-              type="text"
-              name="phone"
-              placeholder="Phone"
-              value={formData.phone}
-              onChange={handleChange}
-              className={inputStyles}
-            />
+              {/* Phone */}
+              <div className="relative">
+                <Phone className="absolute left-3.5 top-3.5 w-4.5 h-4.5 text-[var(--muted-foreground)]" />
+                <input
+                  type="tel"
+                  name="phone"
+                  placeholder="Phone Number"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  className={inputBase}
+                />
+              </div>
 
-            <input
-              type="date"
-              name="dateOfBirth"
-              value={formData.dateOfBirth}
-              onChange={handleChange}
-              className={inputStyles}
-              style={{ colorScheme: "var(--background) === '#ffffff' ? 'light' : 'dark'" }} // Helps native date picker adapt
-            />
+              {/* Date of Birth */}
+              <div className="relative">
+                <Calendar className="absolute left-3.5 top-3.5 w-4.5 h-4.5 text-[var(--muted-foreground)]" />
+                <input
+                  type="date"
+                  name="dateOfBirth"
+                  value={formData.dateOfBirth}
+                  onChange={handleChange}
+                  className={inputBase}
+                />
+              </div>
+            </div>
 
-            <input
-              type="text"
-              name="guardianName"
-              placeholder="Guardian Name"
-              value={formData.guardianName}
-              onChange={handleChange}
-              className={inputStyles}
-            />
-
-            <input
-              type="text"
-              name="guardianPhone"
-              placeholder="Guardian Phone"
-              value={formData.guardianPhone}
-              onChange={handleChange}
-              className={inputStyles}
-            />
+            {/* Address */}
+            <div className="relative mt-5">
+              <MapPin className="absolute left-3.5 top-3.5 w-4.5 h-4.5 text-[var(--muted-foreground)]" />
+              <textarea
+                name="address"
+                placeholder="Residential Address"
+                value={formData.address}
+                onChange={handleChange}
+                className={inputBase + " pl-11 pt-3 resize-none"}
+                rows={3}
+              />
+            </div>
           </div>
 
-          <textarea
-            name="address"
-            placeholder="Address"
-            value={formData.address}
-            onChange={handleChange}
-            className={inputStyles}
-            rows={4}
-          />
+          {/* Guardian Information */}
+          <div className="rounded-2xl border border-[var(--border)] bg-[var(--card)] p-6 shadow-sm">
+            <h2 className={sectionTitle}>Guardian Information</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div className="relative">
+                <Users className="absolute left-3.5 top-3.5 w-4.5 h-4.5 text-[var(--muted-foreground)]" />
+                <input
+                  type="text"
+                  name="guardianName"
+                  placeholder="Guardian Name"
+                  value={formData.guardianName}
+                  onChange={handleChange}
+                  className={inputBase}
+                />
+              </div>
 
-          <div className="flex justify-end">
+              <div className="relative">
+                <Phone className="absolute left-3.5 top-3.5 w-4.5 h-4.5 text-[var(--muted-foreground)]" />
+                <input
+                  type="tel"
+                  name="guardianPhone"
+                  placeholder="Guardian Phone"
+                  value={formData.guardianPhone}
+                  onChange={handleChange}
+                  className={inputBase}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Account Security */}
+          <div className="rounded-2xl border border-[var(--border)] bg-[var(--card)] p-6 shadow-sm">
+            <h2 className={sectionTitle}>Account Security</h2>
+
+            <div className="flex items-start gap-4 p-4 rounded-xl bg-[var(--muted)]/50 border border-[var(--border)] mb-5">
+              <ShieldCheck className="w-5 h-5 text-[var(--primary)] shrink-0 mt-0.5" />
+              <div>
+                <p className="text-sm font-medium text-[var(--foreground)]">Password Update</p>
+                <p className="text-xs text-[var(--muted-foreground)] mt-0.5">
+                  Leave blank to keep the current password unchanged. Enter a new password to reset it.
+                </p>
+              </div>
+            </div>
+
+            <div className="relative max-w-md">
+              <Lock className="absolute left-3.5 top-3.5 w-4.5 h-4.5 text-[var(--muted-foreground)]" />
+              <input
+                type={showPassword ? "text" : "password"}
+                name="password"
+                placeholder="New Password (leave blank to keep current)"
+                value={formData.password}
+                onChange={handleChange}
+                className={inputBase + " pr-12"}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3.5 top-3.5 text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors"
+                tabIndex={-1}
+              >
+                {showPassword ? <EyeOff className="w-4.5 h-4.5" /> : <Eye className="w-4.5 h-4.5" />}
+              </button>
+            </div>
+          </div>
+
+          {/* Actions */}
+          <div className="flex items-center justify-end gap-3 pt-2">
+            <button
+              type="button"
+              onClick={() => router.push("/admin/students")}
+              className="px-6 py-3 rounded-xl border border-[var(--border)] text-sm font-medium text-[var(--foreground)]
+                hover:bg-[var(--muted)] transition-colors duration-200"
+            >
+              Cancel
+            </button>
             <button
               type="submit"
               disabled={saving}
-              className="bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 px-6 py-3 rounded-lg font-medium hover:bg-slate-800 dark:hover:bg-slate-200 transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[var(--primary)] text-white text-sm font-medium
+                hover:bg-[var(--primary-hover)] transition-all duration-200 shadow-md shadow-[var(--primary)]/20
+                disabled:opacity-60 disabled:cursor-not-allowed disabled:shadow-none"
             >
-              {saving ? "Saving..." : "Update Student"}
+              {saving ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <Save className="w-4 h-4" />
+                  Update Student
+                </>
+              )}
             </button>
           </div>
         </form>

@@ -844,32 +844,61 @@ async(req,res) => {
 
     }
 
-    const enrollment =
-      await Enrollment.findOne({
+    const enrollments =
+      await Enrollment.find({
+
         student:student._id,
         status:"ACTIVE"
+
       })
       .populate({
+
         path:"batch",
+
         select:
         "name studyMode course"
-      });
 
-    if(!enrollment){
+      }).populate({
+
+  path:"batch",
+
+  select:
+  "name studyMode course",
+
+  populate:{
+    path:"course",
+    select:"title"
+  }
+
+});
+
+    if(!enrollments.length){
 
       return res.status(404).json({
+
         success:false,
-        message:"No active enrollment found"
+
+        message:
+        "No active enrollment found"
+
       });
 
     }
+
+    const batches =
+      enrollments
+      .filter(
+        enrollment => enrollment.batch
+      )
+      .map(
+        enrollment => enrollment.batch
+      );
 
     return res.status(200).json({
 
       success:true,
 
-      batch:
-      enrollment.batch
+      batches
 
     });
 

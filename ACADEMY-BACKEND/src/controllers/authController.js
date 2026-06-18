@@ -58,11 +58,11 @@ exports.registerUser = async (req, res) => {
     // Hash Password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-
+    
     // Create User
     const user = await User.create({
       fullName,
-      email,
+      email: email.toLowerCase() ,
       password: hashedPassword,
       role
     });
@@ -91,8 +91,8 @@ exports.loginUser = async (req, res) => {
   try {
 
     const { email, password } = req.body;
-
-    const user = await User.findOne({ email });
+    
+    const user = await User.findOne({ email: email.toLowerCase() });
 
     if (!user) {
       return res.status(400).json({

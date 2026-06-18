@@ -123,10 +123,8 @@ exports.deleteStudent = async(req,res) => {
   }
 };
 //------------UPDATE STUDENT-------------
-exports.updateStudent = async (req,res) => {
-
-  try{
-
+exports.updateStudent = async (req, res) => { 
+  try {
     const {
       name,
       email,
@@ -134,68 +132,55 @@ exports.updateStudent = async (req,res) => {
       address,
       guardianName,
       guardianPhone,
-      dateOfBirth
-    } = req.body;
+      dateOfBirth,
+      password,
+       } = req.body;
 
-    const student =
-    await Student.findById(req.params.id);
+    const student = await Student.findById(req.params.id);
 
-    if(!student){
-
+    if (!student) {
       return res.status(404).json({
-        success:false,
-        message:"Student not found"
+        success: false,
+        message: "Student not found",
       });
+    }
 
+    // Build user update object
+    const userUpdate = { name, email };
+
+    // Hash and add password only if provided
+    if (password && password.trim() !== "") {
+      userUpdate.password = await bcrypt.hash(password, 10);
     }
 
     // UPDATE USER
-
-    await User.findByIdAndUpdate(
-      student.userId,
-      {
-        name,
-        email
-      },
-      {
-        new:true
-      }
-    );
+    await User.findByIdAndUpdate(student.userId, userUpdate, { new: true });
 
     // UPDATE STUDENT PROFILE
-
-    const updatedStudent =
-    await Student.findByIdAndUpdate(
+    const updatedStudent = await Student.findByIdAndUpdate(
       req.params.id,
       {
         phone,
         address,
         guardianName,
         guardianPhone,
-        dateOfBirth
+        dateOfBirth,
       },
       {
-        new:true,
-        runValidators:true
+        new: true,
+        runValidators: true,
       }
-    ).populate(
-      "userId",
-      "name email"
-    );
+    ).populate("userId", "name email");
 
     res.status(200).json({
-      success:true,
-      data:updatedStudent
+      success: true,
+      data: updatedStudent,
     });
-
-  }catch(error){
-
+  } catch (error) {
     res.status(500).json({
-      message:error.message
+      message: error.message,
     });
-
   }
-
 };
 
 //------------GET SINGLE STUDENT-------------

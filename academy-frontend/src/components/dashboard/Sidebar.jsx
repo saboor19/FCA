@@ -109,7 +109,7 @@ const Sidebar = ({ role }) => {
       { name: "Fees", href: "/student/fees" },
       { name: "Performance", href: "/student/performance" },
       { name: "Achievements", href: "/student/achievements" },
-      { name: "Notices", href: "/student/notice" },
+      { name: "Notices", href: "/student/notices" },
     ],
   };
 

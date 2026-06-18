@@ -107,6 +107,21 @@ const noticeSchema = new mongoose.Schema({
 ]
 
 });
+noticeSchema.index({
+  targetAudience:1
+});
+
+noticeSchema.index({
+  publishDate:-1
+});
+
+noticeSchema.index({
+  isPublished:1
+});
+
+noticeSchema.index({
+  expiryDate:1
+});
 
 module.exports =
 mongoose.model(

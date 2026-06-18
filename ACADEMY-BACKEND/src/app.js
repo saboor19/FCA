@@ -94,9 +94,9 @@ app.use("/api/teacher/assignments",require("./routes/teacher/assignmentRoutes") 
 
 //----------------STUDENT ROUTES----------------
 
- app.use("/api/student/assignments", require("./routes/student/assignmentRoutes"));
+app.use("/api/student/assignments", require("./routes/student/assignmentRoutes"));
 app.use("/api/student/attendance",require("./routes/student/attendanceRoutes"))
-
+app.use("/api/student/notices/",require("./routes/student/noticeRoutes"));
 app.use("/api/student/assignments", require("./routes/student/assignmentRoutes"));
 app.use("/api/student/batches",  require("./routes/student/batchRoutes"));
 app.use("/api/student/timetable",require("./routes/student/timetableRoutes"));
