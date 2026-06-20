@@ -69,7 +69,7 @@ app.use("/api/auth", authRoutes);
 
 //---------------public routes----------------
 app.use("/api/courses", publicCourseRoutes);
-
+app.use("/api/public/enrollment",require("./routes/public/enrollementRoutes"));
 
 //---------------- admin routes
 app.use("/api/admin/courses", courseRoutes);
@@ -82,7 +82,7 @@ app.use( "/api/admin/notices", require("./routes/admin/noticeRoutes") );
 app.use( "/api/admin/timetables", require("./routes/admin/timetableRoutes"));
 app.use( "/api/admin/fees", feeRoutes );
 app.use("/api/admin/finance",financeRoutes);
-
+app.use("/api/admin/admissions",require("./routes/admin/admissionRoutes"));
 //----------------TEACHER ROUTES------------
 app.use( "/api/teacher/batches", require("./routes/teacher/batchRoutes"));
 app.use( "/api/teacher/timetable", require("./routes/teacher/timetableRoutes"));
