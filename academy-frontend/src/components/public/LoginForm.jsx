@@ -59,7 +59,7 @@ export default function LoginForm() {
   };
 
   const isEmailValid = formData.email.includes("@") && formData.email.includes(".");
-  const isFormValid = isEmailValid && formData.password.length >= 6;
+  const isFormValid = isEmailValid && formData.password.length >= 4;
 
   return (
     <div className="w-full">
@@ -142,7 +142,7 @@ export default function LoginForm() {
           </div>
           <div className="flex items-center justify-between">
             <p className="text-xs text-muted-foreground">
-              {formData.password.length > 0 && formData.password.length < 6 && (
+              {formData.password.length > 0 && formData.password.length < 4 && (
                 <span className="text-amber-600 dark:text-amber-400">Minimum 6 characters</span>
               )}
             </p>
