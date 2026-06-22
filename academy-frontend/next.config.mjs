@@ -5,7 +5,8 @@ const nextConfig = {
     'localhost',
     '192.168.1.4', 
     '10.106.186.113',     // your mobile IP
-    '192.168.1.*',      // any device on the same subnet
+    '192.168.1.*', 
+    '172.17.80.1',     // any device on the same subnet
   ],
   async rewrites() {
     return [

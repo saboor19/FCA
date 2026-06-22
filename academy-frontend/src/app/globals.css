@@ -1,6 +1,5 @@
 @import "tailwindcss";
 
-/* 1. Tell Tailwind to create utility classes from your variables */
 @theme {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -15,44 +14,44 @@
   --color-destructive: var(--destructive);
 }
 
-/* 2. Light mode – clean, high contrast, inviting */
+/* 1. Light mode – warm, authoritative, editorial */
 :root {
-  --background: #f8fafc;      /* Slate-50 – soft, less harsh than white */
-  --foreground: #0f172a;      /* Slate-900 – deep, readable */
-  --card: #ffffff;            /* Pure white for card clarity */
-  --border: #e2e8f0;          /* Slate-200 – subtle border */
-  --primary: #4f46e5;         /* Indigo-600 – trustworthy, energetic */
-  --primary-hover: #4338ca;   /* Indigo-700 */
-  --secondary: #334155;       /* Slate-700 – for less prominent buttons */
-  --accent: #f59e0b;          /* Amber-500 – warm highlight (CTAs) */
-  --muted: #f1f5f9;           /* Slate-100 – for subtle backgrounds */
-  --muted-foreground: #64748b;/* Slate-500 – for secondary text */
-  --destructive: #ef4444;     /* Red-500 – errors/deletions */
+  --background: #fafaf9;      /* Stone-50 – warmer, more inviting than slate */
+  --foreground: #1c1917;      /* Stone-900 – softer than pure black */
+  --card: #ffffff;            /* Pure white for maximum clarity */
+  --border: #e7e5e4;          /* Stone-200 – subtle, warm borders */
+  --primary: #3730a3;         /* Indigo-800 – deeper, more authoritative */
+  --primary-hover: #312e81;   /* Indigo-900 – richer on interaction */
+  --secondary: #44403c;       /* Stone-700 – warm neutral, professional */
+  --accent: #d97706;          /* Amber-600 – complement of indigo, grounded gold */
+  --muted: #f5f5f4;           /* Stone-100 – subtle warm backgrounds */
+  --muted-foreground: #78716c;/* Stone-500 – refined secondary text */
+  --destructive: #dc2626;     /* Red-600 – slightly deeper, more serious */
 }
 
-/* 3. Dark mode – deep, calm, reduced eye strain */
+/* 2. Dark mode – deep, sophisticated, reduced eye strain */
 .dark {
-  --background: #0a0f1c;      /* Darker, richer slate base */
-  --foreground: #f1f5f9;      /* Slate-100 – off‑white for readability */
-  --card: #111827;            /* Gray-900 – slightly lifted */
-  --border: #1f2937;          /* Gray-800 – subtle definition */
-  --primary: #6366f1;         /* Indigo-500 – bright but not overwhelming */
-  --primary-hover: #818cf8;   /* Indigo-400 */
-  --secondary: #475569;       /* Slate-600 */
-  --accent: #fbbf24;          /* Amber-400 – vibrant but not neon */
-  --muted: #1e293b;           /* Slate-800 */
-  --muted-foreground: #94a3b8;/* Slate-400 */
-  --destructive: #f87171;     /* Red-400 */
+  --background: #0c0a09;      /* Stone-950 – near-black with warmth */
+  --foreground: #f5f5f4;      /* Stone-100 – off-white, easy on eyes */
+  --card: #1c1917;            /* Stone-900 – lifted but cohesive */
+  --border: #292524;          /* Stone-800 – subtle warm definition */
+  --primary: #818cf8;         /* Indigo-400 – bright but not harsh */
+  --primary-hover: #a5b4fc;   /* Indigo-300 – luminous on hover */
+  --secondary: #a8a29e;       /* Stone-400 – warm gray for balance */
+  --accent: #fbbf24;          /* Amber-400 – vibrant but controlled gold */
+  --muted: #1c1917;           /* Stone-900 – subtle depth */
+  --muted-foreground: #a8a29e;/* Stone-400 – readable secondary text */
+  --destructive: #f87171;     /* Red-400 – clear without being aggressive */
 }
 
-/* 4. Smooth theme transitions */
+/* 3. Smooth theme transitions */
 body {
   background: var(--background);
   color: var(--foreground);
   transition: background 0.2s ease, color 0.2s ease;
 }
 
-/* 5. Optional: style scrollbar for consistency (improves polish) */
+/* 4. Consistent scrollbar styling */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
