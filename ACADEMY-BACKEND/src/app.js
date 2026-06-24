@@ -33,6 +33,7 @@ const errorHandler = require("./middlewares/errorMiddleware");
 
 const app = express();
 
+console.log("frontend url : ",process.env.FRONTEND_URL);
 app.use(helmet());
 app.use(
   cors({
