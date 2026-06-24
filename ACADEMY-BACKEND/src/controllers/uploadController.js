@@ -104,15 +104,23 @@ exports.getFile = async(req,res) => {
 
     const file = files[0];
 
-
+console.log(file);
 
     // IMPORTANT HEADERS
-    res.set("Content-Type",file.contentType);
+const contentType =
+  file.filename.endsWith(".pdf")
+  ? "application/pdf"
+  : "application/octet-stream";
 
-    res.set(
-      "Cross-Origin-Resource-Policy",
-      "cross-origin"
-    );
+res.set(
+  "Content-Type",
+  contentType
+);
+
+res.set(
+  "Content-Disposition",
+  `inline; filename="${file.filename}"`
+);
 
 
 

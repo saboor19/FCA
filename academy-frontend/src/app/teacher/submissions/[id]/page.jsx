@@ -117,7 +117,8 @@ export default function TeacherSubmissionPage() {
   const [submission, setSubmission] = useState(null);
   const [loading, setLoading] = useState(true);
   const [expandedAnswers, setExpandedAnswers] = useState(new Set());
-
+  const getFileUrl = (fileId) =>
+`${process.env.NEXT_PUBLIC_API_URL}/uploads/${fileId}`;
   useEffect(() => {
     if (id) fetchSubmission();
   }, [id]);
@@ -505,20 +506,78 @@ export default function TeacherSubmissionPage() {
                             Attachments ({answer.uploadedFiles.length})
                           </label>
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                            {answer.uploadedFiles.map((file, fIndex) => (
-                              <div 
-                                key={fIndex}
-                                className="flex items-center gap-3 p-3 rounded-xl border border-border-custom bg-muted/30 hover:bg-muted/50 transition-colors"
-                              >
-                                <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
-                                  <Icons.Paperclip />
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                  <p className="text-sm font-medium text-foreground truncate">{file.filename}</p>
-                                  <p className="text-xs text-muted-foreground">{file.contentType}</p>
-                                </div>
-                              </div>
-                            ))}
+   {answer.uploadedFiles.map((file,fIndex)=>(
+
+  <div
+    key={fIndex}
+    className="
+      flex
+      items-center
+      gap-3
+      p-3
+      rounded-xl
+      border
+      border-border-custom
+      bg-muted/30
+    "
+  >
+
+    <div
+      className="
+        w-9
+        h-9
+        rounded-lg
+        bg-primary/10
+        flex
+        items-center
+        justify-center
+      "
+    >
+      <Icons.Paperclip />
+    </div>
+
+    <div className="flex-1">
+
+      <p
+        className="
+          text-sm
+          font-medium
+        "
+      >
+        {file.filename}
+      </p>
+
+      <p
+        className="
+          text-xs
+          text-muted-foreground
+        "
+      >
+        {file.contentType}
+      </p>
+
+    </div>
+
+    <a
+      href={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${file.fileId}`}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="
+        px-3
+        py-1.5
+        rounded-lg
+        bg-primary
+        text-white
+        text-xs
+        font-medium
+      "
+    >
+      View
+    </a>
+
+  </div>
+
+))}
                           </div>
                         </div>
                       )}
