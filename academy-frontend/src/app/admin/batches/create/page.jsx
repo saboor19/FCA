@@ -1,5 +1,5 @@
 "use client";
-
+import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
@@ -18,7 +18,18 @@ import {
   Monitor,
   CheckCircle,
 } from "lucide-react";
-import AttendanceLocationPicker from "@/components/admin/batches/AttendanceLocationPicker";
+const AttendanceLocationPicker =
+dynamic(
+  () =>
+    import(
+      "@/components/admin/batches/AttendanceLocationPicker"
+    ),
+  {
+    ssr:false
+  }
+);
+
+// import AttendanceLocationPicker from "@/components/admin/batches/AttendanceLocationPicker";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import api from "@/lib/api";
 import { createBatch } from "@/services/admin/batchService";
