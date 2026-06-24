@@ -245,12 +245,12 @@ async(req,res) => {
           ).toFixed(2)
         );
 
-        console.log("sending stats: ",         total,
-        present,
-        absent,
-        leave,
-        late,
-        percentage);
+        // console.log("sending stats: ",         total,
+        // present,
+        // absent,
+        // leave,
+        // late,
+        // percentage);
 
     return res.status(200).json({
 

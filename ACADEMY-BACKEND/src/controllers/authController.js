@@ -21,8 +21,8 @@ const generateToken = (id, role) => {
 exports.getMe = async(req,res) => {
   try{
 
-    console.log("Cookies:", req.cookies);
-console.log("Token:", req.cookies.token);
+//     console.log("Cookies:", req.cookies);
+// console.log("Token:", req.cookies.token);
 
     res.status(200).json({
       user:req.user

@@ -101,8 +101,8 @@ app.use("/api/student/notices/",require("./routes/student/noticeRoutes"));
 app.use("/api/student/assignments", require("./routes/student/assignmentRoutes"));
 app.use("/api/student/batches",  require("./routes/student/batchRoutes"));
 app.use("/api/student/timetable",require("./routes/student/timetableRoutes"));
-
-
+app.use("/api/student/fees",require("./routes/student/feeRoutes"));
+app.use("/api/student/profile",require("./routes/student/profileRoutes"));
 
 //----------------image upload routes----------------
 app.use("/api/uploads", require("./routes/uploadRoutes"));

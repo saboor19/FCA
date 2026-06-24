@@ -104,7 +104,7 @@ exports.getFile = async(req,res) => {
 
     const file = files[0];
 
-console.log(file);
+// console.log(file);
 
     // IMPORTANT HEADERS
 const contentType =
