@@ -217,6 +217,10 @@ function TestimonialMarquee() {
 
 // ─── Main Component ───
 export default function Home() {
+  console.log(
+  "API URL:",
+  process.env.NEXT_PUBLIC_API_URL
+);
   const [courses, setCourses] = useState([]);
   const [activeTab, setActiveTab] = useState(0);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
