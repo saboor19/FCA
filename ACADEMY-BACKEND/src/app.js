@@ -34,15 +34,15 @@ const errorHandler = require("./middlewares/errorMiddleware");
 const app = express();
 
 app.use(helmet());
-app.use(cors({
-  origin: [
-    "http://localhost:3000",
-    "http://192.168.1.4:3000",
-    "http://10.106.186.113:3000",
-    "http://192.168.1.*:3000"
-  ],
-  credentials: true
-}));
+app.use(
+  cors({
+    origin:[
+      process.env.FRONTEND_URL,
+      "http://localhost:3000"
+    ],
+    credentials:true
+  })
+);
 app.use(morgan("dev"));
 app.use(express.json());
 app.use(cookieParser());
