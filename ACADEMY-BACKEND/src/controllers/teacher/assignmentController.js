@@ -14,7 +14,7 @@ const Student =
 require("../../models/Student");
 
 const validateTeacherAssignment =
-require("../../utils/assignment/validateTeacherAssignment");
+require("../../utils/assignment/validateteacherAssignment");
 
 exports.createAssignment = async(req,res) => {
 
