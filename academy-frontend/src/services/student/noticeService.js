@@ -41,3 +41,19 @@ async(id) => {
   return data;
 
 };
+
+export const downloadNoticePdf = async (noticeId) => {
+
+  const response = await api.get(
+
+    `/student/notices/${noticeId}/pdf`,
+
+    {
+      responseType: "blob"
+    }
+
+  );
+
+  return response.data;
+
+};

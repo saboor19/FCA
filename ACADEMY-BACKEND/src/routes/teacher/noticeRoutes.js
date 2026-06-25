@@ -12,6 +12,9 @@ const {
 } = require(
   "../../middlewares/authMiddleware"
 );
+const {
+  downloadNoticePdf
+} = require("../../controllers/common/noticePdfController");
 
 const {
 
@@ -41,6 +44,12 @@ router.get(
 router.post(
   "/:id/read",
   markNoticeAsRead
+);
+router.get(
+  "/:id/pdf",
+  protect,
+  authorizeRoles("TEACHER"),
+  downloadNoticePdf
 );
 
 module.exports =

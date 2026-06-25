@@ -13,6 +13,11 @@ const {
   "../../controllers/student/noticeController"
 );
 
+
+const {
+  downloadNoticePdf
+} = require("../../controllers/common/noticePdfController");
+
 const {
 
   protect,
@@ -40,6 +45,12 @@ router.get(
 router.post(
   "/:id/read",
   markNoticeAsRead
+);
+router.get(
+  "/:id/pdf",
+  protect,
+  authorizeRoles("STUDENT"),
+  downloadNoticePdf
 );
 
 module.exports =

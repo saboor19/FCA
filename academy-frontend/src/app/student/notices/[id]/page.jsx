@@ -3,8 +3,12 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
+import {getNotice} from "@/services/student/noticeService";
+import NoticePdfButton
+from "@/components/common/NoticePdfButton";
+
 import {
-  getNotice
+  downloadNoticePdf
 } from "@/services/student/noticeService";
 import {
   ArrowLeft,
@@ -279,6 +283,15 @@ export default function NoticeDetailsPage() {
             )}
           </div>
         </article>
+        <NoticePdfButton
+
+  noticeId={notice._id}
+
+  fileName={`${notice.title}.pdf`}
+
+  downloadFunction={downloadNoticePdf}
+
+/>
 
         {/* Bottom Actions */}
         <div className="flex items-center justify-between pt-2">
