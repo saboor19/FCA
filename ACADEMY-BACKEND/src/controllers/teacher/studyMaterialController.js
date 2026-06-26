@@ -29,6 +29,21 @@ const { isPreviewable} = require("../../utils/fileHelpers");
 
 const { formatFileSize }=require("../../utils/fileUtils");
 
+const path = require("path");
+
+const MAX_ATTACHMENTS = 10;
+
+const ALLOWED_TYPES = [
+  "application/pdf",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "application/vnd.ms-powerpoint",
+  "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+  "application/vnd.ms-excel",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "application/zip",
+  "application/x-zip-compressed",
+];
 
 //-----------CREATE STUDY MATERIAL AS DRAFT---------
 exports.createStudyMaterial = async (req, res, next) => {
@@ -491,213 +506,197 @@ next(error);
 
 };
 
-exports.uploadStudyMaterialAttachment = async(req,res,next)=>{
+exports.uploadStudyMaterialAttachment = async (req, res, next) => {
 
-try{
+try {
 
+// ------------------------------------------------
+// Teacher
 // ------------------------------------------------
 
 const teacher =
 await Teacher.findOne({
-
-userId:req.user.id
-
+userId: req.user.id
 });
 
-if(!teacher){
+if (!teacher) {
 
 return res.status(404).json({
-
-success:false,
-
-message:"Teacher not found."
-
+success: false,
+message: "Teacher not found."
 });
 
 }
 
+// ------------------------------------------------
+// Material
 // ------------------------------------------------
 
 const material =
 await StudyMaterial.findById(
-
 req.params.id
-
 );
 
-if(
-!material ||
-material.isDeleted
-){
+if (!material || material.isDeleted) {
 
 return res.status(404).json({
-
-success:false,
-
-message:"Study material not found."
-
+success: false,
+message: "Study material not found."
 });
 
 }
 
 // ------------------------------------------------
+// Ownership
+// ------------------------------------------------
 
-if(
-
-material.createdBy.toString()
-
-!==
-
+if (
+material.createdBy.toString() !==
 teacher._id.toString()
-
-){
+) {
 
 return res.status(403).json({
-
-success:false,
-
-message:"Unauthorized."
-
+success: false,
+message: "Unauthorized."
 });
 
 }
 
 // ------------------------------------------------
+// File
+// ------------------------------------------------
 
-if(!req.file){
+if (!req.file) {
 
 return res.status(400).json({
-
-success:false,
-
-message:"No file uploaded."
-
+success: false,
+message: "No file uploaded."
 });
 
 }
 
 // ------------------------------------------------
+// Maximum Attachments
+// ------------------------------------------------
 
-if(
-
+if (
 material.attachments.length >=
-
 MAX_ATTACHMENTS
-
-){
-
-const bucket =
-getGridFSBucket();
-
-await bucket.delete(
-req.file.id
-);
+) {
 
 return res.status(400).json({
-
-success:false,
-
-message:`Maximum ${MAX_ATTACHMENTS} attachments allowed.`
-
+success: false,
+message: `Maximum ${MAX_ATTACHMENTS} attachments allowed.`
 });
 
 }
 
 // ------------------------------------------------
+// File Type Validation
+// ------------------------------------------------
 
-if(
-
+if (
 !ALLOWED_TYPES.includes(
-
-req.file.contentType
-
+req.file.mimetype
 )
-
-){
-
-const bucket =
-getGridFSBucket();
-
-await bucket.delete(
-req.file.id
-);
+) {
 
 return res.status(400).json({
-
-success:false,
-
-message:"Unsupported file type."
-
+success: false,
+message: "Unsupported file type."
 });
 
 }
 
 // ------------------------------------------------
-
 // Duplicate Detection
+// ------------------------------------------------
 
 const duplicate =
-
 material.attachments.find(
 
-attachment=>
+attachment =>
 
-attachment.originalName===
-
+attachment.originalName ===
 req.file.originalname &&
 
-attachment.size===
-
+attachment.size ===
 req.file.size
 
 );
 
-if(duplicate){
-
-const bucket =
-getGridFSBucket();
-
-await bucket.delete(
-req.file.id
-);
+if (duplicate) {
 
 return res.status(409).json({
-
-success:false,
-
-message:"File already attached."
-
+success: false,
+message: "File already attached."
 });
 
 }
 
 // ------------------------------------------------
+// Upload To GridFS
+// ------------------------------------------------
 
-const extension=
+const bucket =
+getGridFSBucket();
 
+const uploadStream =
+bucket.openUploadStream(
+
+req.file.originalname,
+
+{
+contentType:
+req.file.mimetype
+}
+
+);
+
+uploadStream.end(
+req.file.buffer
+);
+
+await new Promise(
+(resolve, reject) => {
+
+uploadStream.on(
+"finish",
+resolve
+);
+
+uploadStream.on(
+"error",
+reject
+);
+
+}
+);
+
+// ------------------------------------------------
+// Save Attachment Metadata
+// ------------------------------------------------
+
+const extension =
 path.extname(
-
 req.file.originalname
-
 )
-
-.replace(".","")
-
+.replace(".", "")
 .toLowerCase();
 
 material.attachments.push({
 
 fileId:
-req.file.id,
+uploadStream.id,
 
 filename:
-req.file.filename,
+uploadStream.filename,
 
 originalName:
 req.file.originalname,
 
 contentType:
-req.file.contentType,
+req.file.mimetype,
 
 extension,
 
@@ -707,41 +706,45 @@ req.file.size,
 uploadedBy:
 teacher._id,
 
-isPreviewable:isPreviewable(req.file.contentType)
+isPreviewable:
+isPreviewable(
+req.file.mimetype
+)
 
 });
 
-material.updatedBy=
+material.updatedBy =
 teacher._id;
 
-material.version +=1;
+material.version += 1;
 
 await material.save();
 
 // ------------------------------------------------
+// Response
+// ------------------------------------------------
 
 return res.status(201).json({
 
-success:true,
+success: true,
 
-message:"Attachment uploaded successfully.",
+message:
+"Attachment uploaded successfully.",
 
 attachment:
-
 material.attachments[
-material.attachments.length-1
+material.attachments.length - 1
 ]
 
 });
 
-}catch(error){
+} catch (error) {
 
 next(error);
 
 }
 
 };
-
 
 exports.removeStudyMaterialAttachment = async(req,res,next)=>{
 

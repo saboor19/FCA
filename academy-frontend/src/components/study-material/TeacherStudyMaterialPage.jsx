@@ -15,7 +15,7 @@ import ActionButton from "@/components/common/buttons/ActionButton";
 import { useRouter } from "next/navigation";
 import studyMaterialService from "@/services/teacher/studyMaterialService";
 import { getAssignedBatches } from "@/services/teacher/batchService";
-
+import { uploadFile } from "@/services/fileService";
 import StudyMaterialFilters from "./StudyMaterialFilters";
 import StudyMaterialUploadModal from "./StudyMaterialUploadModal";
 
@@ -100,9 +100,9 @@ export default function TeacherStudyMaterialPage() {
 
     {
 
-      key: "subject",
+      key: "Module",
 
-      header: "Subject",
+      header: "Module",
 
     },
 
@@ -232,16 +232,28 @@ export default function TeacherStudyMaterialPage() {
 
   // -------------------------------------------------
 
-async function handleUpload(formData) {
+async function handleUpload(data) {
 
   try {
 
     setLoading(true);
 
-    const response =
-      await studyMaterialService.createStudyMaterial(formData);
+    // Remove file before creating material
+    const { file, ...payload } = data;
 
-    console.log(response);
+    // Step 1: Create material
+    const response =
+      await studyMaterialService.createStudyMaterial(payload);
+
+    // Step 2: Upload attachment
+    if (file) {
+
+      await studyMaterialService.uploadAttachment(
+        response.material._id,
+        file
+      );
+
+    }
 
     setOpenUploadModal(false);
 
