@@ -22,8 +22,7 @@ require("../../models/Student");
 
 
 //-------------GET ASSIGNED BATCHES-------------
-exports.getAssignedBatches =
-async (req, res) => {
+exports.getAssignedBatches = async (req, res) => {
 
   try {
 
@@ -156,10 +155,6 @@ async (req, res) => {
 
       );
 
-    console.log(
-      "sending batches",
-      formattedBatches
-    );
 
     res.status(200).json({
       success: true,
@@ -181,8 +176,7 @@ async (req, res) => {
 };
 
 //-------------GET SINGLE BATCH DETAILS-------------
-exports.getBatchDetails =
-async(req,res) => {
+exports.getBatchDetails = async(req,res) => {
 
   try{
 
