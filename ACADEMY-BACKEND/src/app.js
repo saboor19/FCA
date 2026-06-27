@@ -103,7 +103,7 @@ app.use("/api/student/batches",  require("./routes/student/batchRoutes"));
 app.use("/api/student/timetable",require("./routes/student/timetableRoutes"));
 app.use("/api/student/fees",require("./routes/student/feeRoutes"));
 app.use("/api/student/profile",require("./routes/student/profileRoutes"));
-
+app.use("/api/student/study-materials", require("./routes/student/studyMaterialRoutes"));
 //----------------image upload routes----------------
 app.use("/api/uploads", require("./routes/uploadRoutes"));
 

@@ -1122,7 +1122,6 @@ next(error);
 
 };
 
-//-------------DELETE (SOFT DELETE) MATERIAL -----------------
 //-------------DELETE (SOFT DELETE) MATERIAL WITH CASCADE -----------------
 exports.deleteStudyMaterial = async (req, res, next) => {
   try {
@@ -2133,20 +2132,17 @@ req.params.id
 
 );
 
-if(
-!material ||
-material.isDeleted
-){
+    if(!material || material.isDeleted){
 
-return res.status(404).json({
+      return res.status(404).json({
 
-success:false,
+        success:false,
 
-message:"Study material not found."
+        message:"Study material not found."
 
-});
+      });
 
-}
+    }
 
 // ----------------------------------------------------
 // Ownership
@@ -2443,65 +2439,37 @@ exports.getMyStudyMaterials = async (req, res, next) => {
 };
 
 //--------------GET SINGLE COMTENT NY ID------------
-exports.getSingleStudyMaterial = async(req,res,next)=>{
+exports.getSingleStudyMaterial = async (req, res, next) => {
+  try {
+    const material = await StudyMaterial
+      .findById(req.params.id)
+      .populate("course", "title modules")
+      .populate("sourceBatch", "name")
+      .populate("sharedBatches", "name")
+      .populate("createdBy")
+      .populate({
+        path: "attachments.uploadedBy",
+        populate: {
+          path: "userId",
+          select: "fullName",
+        },
+      });
 
-try{
+    if (!material) {
+      return res.status(404).json({
+        success: false,
+        message: "Study material not found.",
+      });
+    }
 
-const material =
-await StudyMaterial
-
-.findById(
-
-req.params.id
-
-)
-
-.populate(
-"course",
-"title modules"
-)
-
-.populate(
-"sourceBatch",
-"name"
-)
-
-.populate(
-"sharedBatches",
-"name"
-)
-
-.populate(
-"createdBy"
-);
-
-if(!material){
-
-return res.status(404).json({
-
-success:false,
-
-message:"Study material not found."
-
-});
-
-}
-
-return res.json({
-
-success:true,
-
-material
-
-});
-
-}catch(error){
-
-next(error);
-
-}
+    return res.json({
+      success: true,
+      material,
+    });
+  } catch (error) {
+    next(error);
+  }
 };
-
 
 //--------------UPDATE CONTENT --------------------
 exports.updateStudyMaterial = async(req,res,next)=>{
