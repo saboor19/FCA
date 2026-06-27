@@ -2,19 +2,32 @@
 
 export default function FormLabel({
   htmlFor,
-  children,
   required = false,
+  children,
   className = "",
 }) {
   return (
     <label
       htmlFor={htmlFor}
-      className={`mb-2 block text-sm font-medium text-gray-700 ${className}`}
+      className={`
+        inline-flex
+        items-center
+        gap-1
+        text-sm
+        font-medium
+        text-[var(--foreground)]
+        transition-colors
+        ${className}
+      `}
     >
       {children}
-
       {required && (
-        <span className="ml-1 text-red-500">*</span>
+        <span
+          className="text-[var(--destructive)]"
+          aria-hidden="true"
+        >
+          *
+        </span>
       )}
     </label>
   );

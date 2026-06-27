@@ -22,57 +22,76 @@ export default function DataTable({
 
   striped = false,
   hover = true,
+  compact = false,
 }) {
   return (
     <div
       className={`
-        overflow-x-auto
-        rounded-lg
+        group
+        overflow-hidden
+        rounded-2xl
         border
-        border-gray-200
-        bg-white
+        border-[var(--border)]
+        bg-[var(--card)]
         shadow-sm
+        transition-all
+        duration-300
+        hover:shadow-md
         ${className}
       `}
     >
-      <table
-        className={`
-          min-w-full
-          border-collapse
-          ${tableClassName}
-        `}
-      >
-        <TableHeader columns={columns} />
+      <div className="overflow-x-auto">
+        <table
+          className={`
+            w-full
+            border-collapse
+            text-left
+            ${tableClassName}
+          `}
+        >
+          <TableHeader columns={columns} compact={compact} />
 
-        {loading ? (
-          <TableLoader
-            rows={5}
-            columns={columns.length}
-          />
-        ) : data.length === 0 ? (
-          <EmptyTable
-            colSpan={columns.length}
-            title={emptyTitle}
-            description={emptyDescription}
-          />
-        ) : (
-          <TableBody
-            columns={columns}
-            data={data}
-            keyField={keyField}
-            onRowClick={onRowClick}
-            rowClassName={`
-              ${hover ? "hover:bg-gray-50" : ""}
-              ${
-                striped
-                  ? "odd:bg-white even:bg-gray-50/40"
-                  : ""
-              }
-              ${rowClassName}
-            `}
-          />
-        )}
-      </table>
+          {loading ? (
+            <TableLoader
+              rows={Math.min(data.length || 5, 8)}
+              columns={columns.length}
+              compact={compact}
+            />
+          ) : data.length === 0 ? (
+            <EmptyTable
+              colSpan={columns.length}
+              title={emptyTitle}
+              description={emptyDescription}
+            />
+          ) : (
+            <TableBody
+              columns={columns}
+              data={data}
+              keyField={keyField}
+              onRowClick={onRowClick}
+              rowClassName={`
+                transition-colors
+                duration-200
+                ${hover ? "hover:bg-[var(--muted)]/60" : ""}
+                ${
+                  striped
+                    ? "odd:bg-[var(--card)] even:bg-[var(--muted)]/30"
+                    : ""
+                }
+                ${onRowClick ? "cursor-pointer" : ""}
+                ${rowClassName}
+              `}
+              compact={compact}
+            />
+          )}
+        </table>
+      </div>
+
+      {/* Bottom gradient fade for overflow hint */}
+      <div
+        className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-[var(--card)] to-transparent opacity-0 transition-opacity group-hover:opacity-100 sm:hidden"
+        aria-hidden="true"
+      />
     </div>
   );
 }

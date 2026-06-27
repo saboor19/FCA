@@ -93,6 +93,7 @@ const Sidebar = ({ role }) => {
       { name: "My Courses", href: "/teacher/courses" },
       { name: "Students", href: "/teacher/students" },
       { name: "Assignments", href: "/teacher/assignments" },
+      { name: "Study Material", href: "/teacher/study-materials" },
       { name: "Attendance", href: "/teacher/attendance" ,subItems: [{ name: "Leaves", href: "/teacher/leaves" },{ name: "Create Session", href: "/teacher/attendance/session" }],},
       
       { name: "Notices", href: "/teacher/notices" },

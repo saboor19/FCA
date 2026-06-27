@@ -8,9 +8,10 @@ export default function TableBody({
   keyField = "_id",
   onRowClick,
   rowClassName = "",
+  compact = false,
 }) {
   return (
-    <tbody className="divide-y divide-gray-200 bg-white">
+    <tbody className="divide-y divide-[var(--border)]">
       {data.map((row, index) => (
         <TableRow
           key={row[keyField] ?? index}
@@ -18,6 +19,8 @@ export default function TableBody({
           columns={columns}
           onRowClick={onRowClick}
           className={rowClassName}
+          compact={compact}
+          index={index}
         />
       ))}
     </tbody>

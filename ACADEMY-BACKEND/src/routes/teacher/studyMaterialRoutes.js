@@ -29,7 +29,7 @@ unpublishStudyMaterial,
 
 archiveStudyMaterial,
 
-// deleteStudyMaterial,
+deleteStudyMaterial,
 
 restoreStudyMaterial,
 
@@ -86,12 +86,7 @@ authorizeRoles("TEACHER"),
 updateStudyMaterial
 );
 
-// router.delete(
-// "/:id",
-// protect,
-// authorizeRoles("TEACHER"),
-// deleteStudyMaterial
-// );
+
 
 router.patch(
 "/:id/restore",
@@ -185,6 +180,10 @@ protect,
 authorizeRoles("TEACHER"),
 duplicateStudyMaterial
 );
+
+
+router.delete("/:id", protect,
+authorizeRoles("TEACHER"),deleteStudyMaterial);
 
 
 module.exports=

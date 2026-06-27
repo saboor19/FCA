@@ -4,9 +4,9 @@ import { useEffect, useMemo, useState } from "react";
 import {
   Plus,
   Eye,
-  Pencil,
+  Pencil,Users,
   Trash2,
-  Download,
+  Download,BookOpen,Layers
 } from "lucide-react";
 
 import DashboardLayout from "../dashboard/DashboardLayout";
@@ -18,12 +18,14 @@ import { getAssignedBatches } from "@/services/teacher/batchService";
 import { uploadFile } from "@/services/fileService";
 import StudyMaterialFilters from "./StudyMaterialFilters";
 import StudyMaterialUploadModal from "./StudyMaterialUploadModal";
-
+import StatusBadge from "../common/StatusBadge";
 export default function TeacherStudyMaterialPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
   const [materials, setMaterials] = useState([]);
+
+  
 
   const [assignedBatches, setAssignedBatches] = useState([]);
 
@@ -88,83 +90,60 @@ export default function TeacherStudyMaterialPage() {
 
   // -------------------------------------------------
 
-  const columns = [
-
-    {
-
-      key: "title",
-
-      header: "Title",
-
-    },
-
-    {
-
-      key: "Module",
-
-      header: "Module",
-
-    },
-
-    {
-
-      key: "batch",
-
-      header: "Batch",
-
-      render: (row) => row.batch?.name,
-
-    },
-
-    {
-
-      key: "visibility",
-
-      header: "Visibility",
-
-    },
-
-    {
-
-      key: "actions",
-
-      header: "Actions",
-
-      render: (row) => (
-
-        <div className="flex gap-2">
-
-          <ActionButton
-            icon={Eye}
-            variant="ghost"
-            onClick={() => handleView(row)}
-          />
-
-          <ActionButton
-            icon={Download}
-            variant="secondary"
-            onClick={() => handleDownload(row)}
-          />
-
-          <ActionButton
-            icon={Pencil}
-            variant="warning"
-            onClick={() => handleEdit(row)}
-          />
-
-          <ActionButton
-            icon={Trash2}
-            variant="danger"
-            onClick={() => handleDelete(row)}
-          />
-
-        </div>
-
-      ),
-
-    },
-
-  ];
+const columns = [
+  {
+    key: "title",
+    header: "Title",
+    headerIcon: BookOpen,
+    width: "30%",
+  },
+  {
+    key: "moduleName",
+    header: "Module",
+    headerIcon: Layers,
+  },
+  {
+    key: "batchName",
+    header: "Batch",
+    headerIcon: Users,
+  },
+  {
+    key: "visibilityLabel",
+    header: "Visibility",
+    align: "center",
+    render: (row) => (
+      <span
+        className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
+          row.visibility === "BATCH_ONLY"
+            ? "bg-[var(--muted)] text-[var(--muted-foreground)]"
+            : "bg-[var(--primary)]/10 text-[var(--primary)]"
+        }`}
+      >
+        {row.visibilityLabel}
+      </span>
+    ),
+  },
+  {
+    key: "status",
+    header: "Status",
+    align: "center",
+    render: (row) => (
+      <StatusBadge status={row.status} />
+    ),
+  },
+  {
+    key: "actions",
+    header: "Actions",
+    align: "right",
+    render: (row) => (
+      <div className="flex items-center justify-end gap-1">
+        <ActionButton icon={Eye} variant="ghost" size="sm" onClick={() => handleView(row)} />
+        <ActionButton icon={Pencil} variant="ghost" size="sm" onClick={() => handleEdit(row)} />
+        <ActionButton icon={Trash2} variant="ghost" size="sm" onClick={() => handleDelete(row)} />
+      </div>
+    ),
+  },
+];
 
   // -------------------------------------------------
   // Initial Data

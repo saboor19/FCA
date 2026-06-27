@@ -2,7 +2,7 @@ import "./globals.css";
 import AppNavbar from "@/components/public/AppNavbar";
 import {Providers} from "@/components/providers";
 import {AuthProvider} from "@/context/AuthContext";
-import Footer from "@/components/public/Footer";
+import ConditionalFooter from "@/components/public/ConditionalFooter";
 import "leaflet/dist/leaflet.css";
 export const metadata = {
   title:"Academy Web App",
@@ -23,7 +23,7 @@ export default function RootLayout({children}) {
 
             {children}
 
-          <Footer />
+          <ConditionalFooter />
 
           </AuthProvider>
 

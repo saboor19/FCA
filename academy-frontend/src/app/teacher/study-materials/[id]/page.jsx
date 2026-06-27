@@ -58,31 +58,48 @@ export default function TeacherStudyMaterialDetailsPage() {
 
   const handlePublish = useCallback(async () => {
     try {
-      const newStatus = material?.status === "PUBLISHED" ? "DRAFT" : "PUBLISHED";
-      await studyMaterialService.updateStatus(id, newStatus);
-      setMaterial((prev) => ({ ...prev, status: newStatus }));
-      showToast("success", newStatus === "PUBLISHED" ? "Material published successfully" : "Material unpublished");
+      const isCurrentlyPublished = material?.status === "PUBLISHED";
+      
+      if (isCurrentlyPublished) {
+        await studyMaterialService.unpublishStudyMaterial(id);
+        setMaterial((prev) => ({ ...prev, status: "DRAFT" }));
+        showToast("success", "Material unpublished successfully");
+      } else {
+        await studyMaterialService.publishStudyMaterial(id);
+        setMaterial((prev) => ({ ...prev, status: "PUBLISHED", publishedAt: new Date() }));
+        showToast("success", "Material published successfully");
+      }
     } catch (err) {
+      console.error("Publish error:", err);
       showToast("error", "Failed to update status. Please try again.");
     }
   }, [id, material?.status, showToast]);
 
   const handleDuplicate = useCallback(async () => {
     try {
-      const response = await studyMaterialService.duplicate(id);
+      const response = await studyMaterialService.duplicateStudyMaterial(id, {
+        includeAttachments: true,
+        includeSharedBatches: false
+      });
       showToast("success", "Material duplicated successfully");
+      // Navigate to the new duplicated material's edit page
       router.push(`/teacher/study-materials/${response.material._id}/edit`);
     } catch (err) {
+      console.error("Duplicate error:", err);
       showToast("error", "Failed to duplicate material.");
     }
   }, [id, router, showToast]);
 
   const handleArchive = useCallback(async () => {
+    if (!window.confirm("Are you sure you want to archive this material? It will be hidden from students.")) {
+      return;
+    }
     try {
-      await studyMaterialService.archive(id);
+      await studyMaterialService.archiveStudyMaterial(id);
       setMaterial((prev) => ({ ...prev, status: "ARCHIVED" }));
       showToast("success", "Material archived successfully");
     } catch (err) {
+      console.error("Archive error:", err);
       showToast("error", "Failed to archive material.");
     }
   }, [id, showToast]);
@@ -92,39 +109,23 @@ export default function TeacherStudyMaterialDetailsPage() {
       return;
     }
     try {
-      await studyMaterialService.delete(id);
+      await studyMaterialService.deleteStudyMaterial(id);
       showToast("success", "Material deleted successfully");
       router.push("/teacher/study-materials");
     } catch (err) {
+      console.error("Delete error:", err);
       showToast("error", "Failed to delete material.");
     }
   }, [id, router, showToast]);
 
-  const handlePreview = useCallback(async (file) => {
-    try {
-      const url = await studyMaterialService.getPreviewUrl(file._id);
-      window.open(url, "_blank", "noopener,noreferrer");
-    } catch (err) {
-      showToast("error", "Failed to generate preview.");
-    }
-  }, [showToast]);
+  /* ── Preview & Download use window.open directly per service implementation ── */
+  const handlePreview = useCallback((file) => {
+    studyMaterialService.previewAttachment(id, file._id);
+  }, [id]);
 
-  const handleDownload = useCallback(async (file) => {
-    try {
-      const blob = await studyMaterialService.download(file._id);
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = file.originalName;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
-      showToast("success", "Download started");
-    } catch (err) {
-      showToast("error", "Failed to download file.");
-    }
-  }, [showToast]);
+  const handleDownload = useCallback((file) => {
+    studyMaterialService.downloadAttachment(id, file._id);
+  }, [id]);
 
   /* ── Render ── */
   return (

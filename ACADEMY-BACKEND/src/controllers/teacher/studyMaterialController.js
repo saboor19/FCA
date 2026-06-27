@@ -1122,6 +1122,72 @@ next(error);
 
 };
 
+//-------------DELETE (SOFT DELETE) MATERIAL -----------------
+//-------------DELETE (SOFT DELETE) MATERIAL WITH CASCADE -----------------
+exports.deleteStudyMaterial = async (req, res, next) => {
+  try {
+    const teacher = await Teacher.findOne({ userId: req.user.id });
+
+    if (!teacher) {
+      return res.status(404).json({
+        success: false,
+        message: "Teacher not found."
+      });
+    }
+
+    const material = await StudyMaterial.findById(req.params.id);
+
+    if (!material || material.isDeleted) {
+      return res.status(404).json({
+        success: false,
+        message: "Study material not found."
+      });
+    }
+
+    if (material.createdBy.toString() !== teacher._id.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: "Unauthorized."
+      });
+    }
+
+    // ----------------------------------------------------
+    // Cascade Delete: Remove all GridFS files
+    // ----------------------------------------------------
+    const bucket = getGridFSBucket();
+
+    if (material.attachments && material.attachments.length > 0) {
+      const deletePromises = material.attachments.map(async (attachment) => {
+        try {
+          const fileId = new mongoose.Types.ObjectId(attachment.fileId);
+          await bucket.delete(fileId);
+        } catch (err) {
+          // Log but don't fail if file already missing from GridFS
+          console.warn(`Failed to delete GridFS file ${attachment.fileId}:`, err.message);
+        }
+      });
+
+      await Promise.all(deletePromises);
+    }
+
+    // ----------------------------------------------------
+    // Soft Delete: Mark material as deleted
+    // ----------------------------------------------------
+    material.isDeleted = true;
+    material.deletedAt = new Date();
+    material.deletedBy = teacher._id;
+    material.updatedBy = teacher._id;
+
+    await material.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Study material and attachments deleted successfully."
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
 //------------SHARING WITH BATCHES WITH SIMILAR COURSE -----------
 exports.shareStudyMaterial = async(req,res,next)=>{
@@ -2284,175 +2350,97 @@ next(error);
 };
 
 // --------------GET ALL CONTENT--------------------
-exports.getMyStudyMaterials= async(req,res,next)=>{
- try{
+exports.getMyStudyMaterials = async (req, res, next) => {
+  try {
+    const teacher = await Teacher.findOne({ userId: req.user.id });
 
-const teacher=
-await Teacher.findOne({
+    if (!teacher) {
+      return res.status(404).json({
+        success: false,
+        message: "Teacher not found."
+      });
+    }
 
-userId:req.user.id
+    // ---------------------------------------------
+    const baseQuery = {
+      createdBy: teacher._id,
+      isDeleted: false
+    };
 
-});
+    // ---------------------------------------------
+    // Build query with proper population
+    // Include moduleId and visibility in select
+    // Populate course with modules to resolve module names
+    // ---------------------------------------------
+    let query = StudyMaterial
+      .find(baseQuery)
+      .select(
+        "materialNumber title status type difficulty sourceBatch course moduleId visibility sharedBatches publishedAt version createdAt"
+      )
+      .populate("course", "title modules")
+      .populate("sourceBatch", "name")
+      .populate("sharedBatches", "name");
 
-if(!teacher){
+    const apiFeatures = new APIFeatures(query, req.query)
+      .search()
+      .filter()
+      .sort()
+      .paginate();
 
-return res.status(404).json({
+    const materials = await apiFeatures.query.lean();
 
-success:false,
+    // ---------------------------------------------
+    // Resolve module names from embedded course.modules
+    // ---------------------------------------------
+    const formattedMaterials = materials.map((mat) => {
+      const module = mat.course?.modules?.find(
+        (m) =>
+          m._id?.toString() === mat.moduleId?.toString() ||
+          m._id === mat.moduleId
+      );
 
-message:"Teacher not found."
+      return {
+        ...mat,
+        moduleName: module?.title || "—",
+        batchName: mat.sourceBatch?.name || "—",
+        visibilityLabel:
+          mat.visibility === "SHARED_BATCHES" && mat.sharedBatches?.length > 0
+            ? `Shared (${mat.sharedBatches.length})`
+            : mat.visibility === "BATCH_ONLY"
+            ? "Batch Only"
+            : mat.visibility || "—",
+      };
+    });
 
-});
+    // ---------------------------------------------
+    // Filtered count
+    // ---------------------------------------------
+    const filteredQuery = { ...baseQuery };
+    if (req.query.status) filteredQuery.status = req.query.status;
+    if (req.query.type) filteredQuery.type = req.query.type;
+    if (req.query.sourceBatch) filteredQuery.sourceBatch = req.query.sourceBatch;
+    if (req.query.moduleId) filteredQuery.moduleId = req.query.moduleId;
+    if (req.query.difficulty) filteredQuery.difficulty = req.query.difficulty;
+    if (req.query.search && req.query.search.trim() !== "") {
+      filteredQuery.$text = { $search: req.query.search };
+    }
 
-}
+    const filteredCount = await StudyMaterial.countDocuments(filteredQuery);
 
-// ---------------------------------------------
-
-const baseQuery={
-
-createdBy:teacher._id,
-
-isDeleted:false
-
+    // ---------------------------------------------
+    return res.status(200).json({
+      success: true,
+      currentPage: apiFeatures.page,
+      totalPages: Math.ceil(filteredCount / apiFeatures.limit),
+      totalMaterials: filteredCount,
+      hasNextPage: apiFeatures.page < Math.ceil(filteredCount / apiFeatures.limit),
+      hasPreviousPage: apiFeatures.page > 1,
+      materials: formattedMaterials
+    });
+  } catch (error) {
+    next(error);
+  }
 };
-
-const totalMaterials= await StudyMaterial.countDocuments(baseQuery);
-
-// ---------------------------------------------
-
-const apiFeatures=
-new APIFeatures(
-
-StudyMaterial
-.find(baseQuery)
-.select(
-
-"materialNumber title status type difficulty sourceBatch course publishedAt version createdAt"
-
-)
-.populate(
-"course",
-"title"
-)
-.populate(
-"sourceBatch",
-"name"
-),
-
-req.query
-
-)
-
-.search()
-
-.filter()
-
-.sort()
-
-.paginate();
-
-// ---------------------------------------------
-
-const materials=
-await apiFeatures.query.lean();
-
-// ---------------------------------------------
-
-const filteredQuery={
-
-...baseQuery
-
-};
-
-if(req.query.status){
-
-filteredQuery.status=
-req.query.status;
-
-}
-
-if(req.query.type){
-
-filteredQuery.type=
-req.query.type;
-
-}
-
-if(req.query.sourceBatch){
-
-filteredQuery.sourceBatch=
-req.query.sourceBatch;
-
-}
-
-if(req.query.moduleId){
-
-filteredQuery.moduleId=
-req.query.moduleId;
-
-}
-
-if(req.query.difficulty){
-
-filteredQuery.difficulty=
-req.query.difficulty;
-
-}
-
-if(req.query.search){
-
-filteredQuery.$text={
-
-$search:req.query.search
-
-};
-
-}
-
-const filteredCount=
-await StudyMaterial.countDocuments(
-
-filteredQuery
-
-);
-
-// ---------------------------------------------
-
-return res.status(200).json({
-
-success:true,
-
-currentPage:
-apiFeatures.page,
-
-totalPages:
-Math.ceil(
-filteredCount/
-apiFeatures.limit
-),
-
-totalMaterials:
-filteredCount,
-
-hasNextPage:
-apiFeatures.page<
-Math.ceil(filteredCount/apiFeatures.limit),
-
-hasPreviousPage:
-apiFeatures.page>1,
-
-materials
-
-});
-
-}catch(error){
-
-next(error);
-
-}
-
-};
-
 
 //--------------GET SINGLE COMTENT NY ID------------
 exports.getSingleStudyMaterial = async(req,res,next)=>{
