@@ -3,13 +3,10 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
-import {getNotice} from "@/services/student/noticeService";
-import NoticePdfButton
-from "@/components/common/NoticePdfButton";
+import { getNotice } from "@/services/student/noticeService";
+import NoticePdfButton from "@/components/common/NoticePdfButton";
+import { downloadNoticePdf } from "@/services/student/noticeService";
 
-import {
-  downloadNoticePdf
-} from "@/services/student/noticeService";
 import {
   ArrowLeft,
   Bell,
@@ -26,7 +23,7 @@ import {
   ExternalLink,
   User,
   Tag,
-  Sparkles
+  Sparkles,
 } from "lucide-react";
 
 export default function NoticeDetailsPage() {
@@ -58,40 +55,61 @@ export default function NoticeDetailsPage() {
         color: "text-[var(--destructive)]",
         bg: "bg-[var(--destructive)]/10",
         border: "border-[var(--destructive)]/20",
-        label: "High Priority"
+        label: "High Priority",
       },
       MEDIUM: {
         icon: Info,
         color: "text-[var(--accent)]",
         bg: "bg-[var(--accent)]/10",
         border: "border-[var(--accent)]/20",
-        label: "Medium Priority"
+        label: "Medium Priority",
       },
       LOW: {
         icon: CheckCircle2,
         color: "text-emerald-500",
         bg: "bg-emerald-500/10",
         border: "border-emerald-500/20",
-        label: "Low Priority"
-      }
+        label: "Low Priority",
+      },
     };
     return configs[priority] || configs.LOW;
   };
 
   const getTypeConfig = (type) => {
     const configs = {
-      ACADEMIC: { icon: FileText, label: "Academic", color: "text-blue-500", bg: "bg-blue-500/10" },
-      EVENT: { icon: Sparkles, label: "Event", color: "text-purple-500", bg: "bg-purple-500/10" },
-      GENERAL: { icon: Info, label: "General", color: "text-[var(--muted-foreground)]", bg: "bg-[var(--muted)]" },
-      URGENT: { icon: AlertTriangle, label: "Urgent", color: "text-[var(--destructive)]", bg: "bg-[var(--destructive)]/10" }
+      ACADEMIC: {
+        icon: FileText,
+        label: "Academic",
+        color: "text-blue-500",
+        bg: "bg-blue-500/10",
+      },
+      EVENT: {
+        icon: Sparkles,
+        label: "Event",
+        color: "text-purple-500",
+        bg: "bg-purple-500/10",
+      },
+      GENERAL: {
+        icon: Info,
+        label: "General",
+        color: "text-[var(--muted-foreground)]",
+        bg: "bg-[var(--muted)]",
+      },
+      URGENT: {
+        icon: AlertTriangle,
+        label: "Urgent",
+        color: "text-[var(--destructive)]",
+        bg: "bg-[var(--destructive)]/10",
+      },
     };
     return configs[type] || configs.GENERAL;
   };
 
   const getFileIcon = (fileName) => {
-    const ext = fileName?.split('.').pop()?.toLowerCase();
-    if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(ext)) return ImageIcon;
-    if (['pdf'].includes(ext)) return FileText;
+    const ext = fileName?.split(".").pop()?.toLowerCase();
+    if (["jpg", "jpeg", "png", "gif", "webp", "svg"].includes(ext))
+      return ImageIcon;
+    if (["pdf"].includes(ext)) return FileText;
     return File;
   };
 
@@ -152,11 +170,11 @@ export default function NoticeDetailsPage() {
     weekday: "long",
     year: "numeric",
     month: "long",
-    day: "numeric"
+    day: "numeric",
   });
   const formattedTime = publishDate.toLocaleTimeString("en-US", {
     hour: "2-digit",
-    minute: "2-digit"
+    minute: "2-digit",
   });
 
   return (
@@ -188,11 +206,15 @@ export default function NoticeDetailsPage() {
                   Pinned Notice
                 </span>
               )}
-              <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold border ${priorityConfig.bg} ${priorityConfig.color} ${priorityConfig.border}`}>
+              <span
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold border ${priorityConfig.bg} ${priorityConfig.color} ${priorityConfig.border}`}
+              >
                 <PriorityIcon className="w-3.5 h-3.5" />
                 {priorityConfig.label}
               </span>
-              <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold ${typeConfig.bg} ${typeConfig.color}`}>
+              <span
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold ${typeConfig.bg} ${typeConfig.color}`}
+              >
                 <TypeIcon className="w-3.5 h-3.5" />
                 {typeConfig.label}
               </span>
@@ -227,14 +249,29 @@ export default function NoticeDetailsPage() {
             </div>
           </div>
 
-          {/* Content Body */}
+          {/* Content Body — RICH TEXT HTML RENDERED */}
           <div className="px-8 pb-8">
-            <div className="prose prose-slate dark:prose-invert max-w-none">
-              <div className="rounded-xl bg-[var(--muted)]/50 p-6 sm:p-8 border border-[var(--border)]">
-                <div className="text-[var(--foreground)] leading-relaxed whitespace-pre-wrap text-base sm:text-lg">
-                  {notice.description}
-                </div>
-              </div>
+            <div className="rounded-xl bg-[var(--muted)]/50 p-6 sm:p-8 border border-[var(--border)]">
+              {/* 
+                KEY CHANGE: dangerouslySetInnerHTML renders the HTML properly.
+                prose classes style headings, lists, links, blockquotes, code, etc.
+                Removed whitespace-pre-wrap since HTML handles its own spacing.
+              */}
+              <div
+                className="prose prose-slate dark:prose-invert max-w-none
+                  prose-headings:font-semibold prose-headings:text-[var(--foreground)]
+                  prose-p:text-[var(--foreground)] prose-p:leading-relaxed prose-p:text-base sm:prose-p:text-lg
+                  prose-a:text-[var(--primary)] prose-a:no-underline hover:prose-a:underline
+                  prose-strong:text-[var(--foreground)] prose-strong:font-semibold
+                  prose-ul:list-disc prose-ul:pl-5
+                  prose-ol:list-decimal prose-ol:pl-5
+                  prose-blockquote:border-l-4 prose-blockquote:border-[var(--accent)] prose-blockquote:bg-[var(--muted)]/30 prose-blockquote:pl-4 prose-blockquote:italic
+                  prose-code:bg-[var(--muted)] prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm
+                  prose-pre:bg-[var(--muted)] prose-pre:rounded-xl prose-pre:p-4"
+                dangerouslySetInnerHTML={{
+                  __html: notice.description || "<p>No content provided.</p>",
+                }}
+              />
             </div>
 
             {/* Attachments */}
@@ -283,15 +320,12 @@ export default function NoticeDetailsPage() {
             )}
           </div>
         </article>
+
         <NoticePdfButton
-
-  noticeId={notice._id}
-
-  fileName={`${notice.title}.pdf`}
-
-  downloadFunction={downloadNoticePdf}
-
-/>
+          noticeId={notice._id}
+          fileName={`${notice.title}.pdf`}
+          downloadFunction={downloadNoticePdf}
+        />
 
         {/* Bottom Actions */}
         <div className="flex items-center justify-between pt-2">
@@ -307,7 +341,9 @@ export default function NoticeDetailsPage() {
           {notice.attachments?.length > 0 && (
             <button
               onClick={() => {
-                notice.attachments.forEach((file) => window.open(file.fileUrl, "_blank"));
+                notice.attachments.forEach((file) =>
+                  window.open(file.fileUrl, "_blank")
+                );
               }}
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[var(--primary)] text-white text-sm font-medium
                 hover:bg-[var(--primary-hover)] transition-colors duration-200 shadow-md shadow-[var(--primary)]/20"

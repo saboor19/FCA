@@ -11,12 +11,12 @@ import {
   Paperclip,
   Users,
   AlertCircle,
-  FileText
+  ChevronRight,
 } from "lucide-react";
 
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import AcademyLoader from "@/components/ui/AcademyLoader";
-import { getNotices } from "@/services/admin/noticeService"; // Note the updated import path
+import { getNotices } from "@/services/admin/noticeService";
 
 export default function NoticesPage() {
   const [notices, setNotices] = useState([]);
@@ -38,28 +38,37 @@ export default function NoticesPage() {
     }
   };
 
-  // Helper to color-code Priority
+  // Strip HTML tags for the list preview
+  const stripHtml = (html) => {
+    if (!html) return "";
+    const tmp = document.createElement("DIV");
+    tmp.innerHTML = html;
+    return tmp.textContent || tmp.innerText || "";
+  };
+
   const getPriorityConfig = (priority) => {
     switch (priority) {
       case "HIGH":
         return {
           icon: <AlertCircle size={14} />,
-          classes: "bg-red-50 border-red-200 text-red-700 dark:bg-red-400/10 dark:border-red-400/20 dark:text-red-400"
+          classes:
+            "bg-red-50 border-red-200 text-red-700 dark:bg-red-400/10 dark:border-red-400/20 dark:text-red-400",
         };
       case "MEDIUM":
         return {
           icon: null,
-          classes: "bg-amber-50 border-amber-200 text-amber-700 dark:bg-amber-400/10 dark:border-amber-400/20 dark:text-amber-400"
+          classes:
+            "bg-amber-50 border-amber-200 text-amber-700 dark:bg-amber-400/10 dark:border-amber-400/20 dark:text-amber-400",
         };
-      default: // LOW
+      default:
         return {
           icon: null,
-          classes: "bg-emerald-50 border-emerald-200 text-emerald-700 dark:bg-emerald-400/10 dark:border-emerald-400/20 dark:text-emerald-400"
+          classes:
+            "bg-emerald-50 border-emerald-200 text-emerald-700 dark:bg-emerald-400/10 dark:border-emerald-400/20 dark:text-emerald-400",
         };
     }
   };
 
-  // Helper to color-code Type
   const getTypeClasses = (type) => {
     switch (type) {
       case "EXAM":
@@ -71,7 +80,7 @@ export default function NoticesPage() {
       case "HOLIDAY":
       case "EVENT":
         return "bg-blue-50 border-blue-200 text-blue-700 dark:bg-blue-500/10 dark:border-blue-500/20 dark:text-blue-400";
-      default: // GENERAL
+      default:
         return "bg-slate-100 border-slate-200 text-slate-700 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300";
     }
   };
@@ -87,7 +96,6 @@ export default function NoticesPage() {
   return (
     <DashboardLayout role="ADMIN">
       <div className="max-w-6xl mx-auto space-y-6">
-        
         {/* HEADER */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div>
@@ -118,7 +126,9 @@ export default function NoticesPage() {
               <div className="w-16 h-16 bg-slate-50 dark:bg-slate-900/50 rounded-full flex items-center justify-center mb-4 text-slate-400 border border-border-custom">
                 <Megaphone size={32} />
               </div>
-              <h3 className="text-lg font-medium text-foreground">No Notices Published</h3>
+              <h3 className="text-lg font-medium text-foreground">
+                No Notices Published
+              </h3>
               <p className="text-slate-500 dark:text-slate-400 mt-1 max-w-sm">
                 Keep everyone informed by publishing your first academy notice.
               </p>
@@ -127,20 +137,19 @@ export default function NoticesPage() {
             <div className="divide-y divide-border-custom">
               {notices.map((notice) => {
                 const priorityConfig = getPriorityConfig(notice.priority);
-                // Use publishDate if available, fallback to createdAt
                 const displayDate = notice.publishDate || notice.createdAt;
+                const plainDescription = stripHtml(notice.description);
 
                 return (
-                  <div
+                  <Link
                     key={notice._id}
-                    className="p-5 md:p-6 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group cursor-pointer"
+                    href={`/admin/notices/${notice._id}`}
+                    className="block p-5 md:p-6 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group cursor-pointer"
                   >
                     <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
-                      
                       {/* MAIN INFO */}
-                      <div className="space-y-3 flex-1">
+                      <div className="space-y-3 flex-1 min-w-0">
                         <div className="flex flex-wrap items-center gap-2 mb-1">
-                          
                           {/* DRAFT BADGE */}
                           {!notice.isPublished && (
                             <span className="px-2 py-0.5 rounded border text-[10px] font-bold uppercase tracking-wider bg-slate-200 border-slate-300 text-slate-700 dark:bg-slate-700 dark:border-slate-600 dark:text-slate-300">
@@ -149,12 +158,18 @@ export default function NoticesPage() {
                           )}
 
                           {/* TYPE BADGE */}
-                          <span className={`px-2 py-0.5 rounded border text-[10px] font-bold uppercase tracking-wider ${getTypeClasses(notice.type)}`}>
+                          <span
+                            className={`px-2 py-0.5 rounded border text-[10px] font-bold uppercase tracking-wider ${getTypeClasses(
+                              notice.type
+                            )}`}
+                          >
                             {notice.type || "GENERAL"}
                           </span>
 
                           {/* PRIORITY BADGE */}
-                          <span className={`flex items-center gap-1 px-2 py-0.5 rounded border text-[10px] font-bold uppercase tracking-wider ${priorityConfig.classes}`}>
+                          <span
+                            className={`flex items-center gap-1 px-2 py-0.5 rounded border text-[10px] font-bold uppercase tracking-wider ${priorityConfig.classes}`}
+                          >
                             {priorityConfig.icon}
                             {notice.priority || "MEDIUM"}
                           </span>
@@ -165,23 +180,43 @@ export default function NoticesPage() {
                         </h2>
 
                         <p className="text-slate-500 dark:text-slate-400 text-sm line-clamp-2 leading-relaxed max-w-4xl">
-                          {notice.description}
+                          {plainDescription}
                         </p>
 
                         {/* META DATA ROW */}
                         <div className="flex flex-wrap items-center gap-5 text-sm text-slate-500 dark:text-slate-400 pt-2">
-                          
-                          <div className="flex items-center gap-1.5" title="Publish Date">
-                            <CalendarDays size={16} className="text-slate-400" />
-                            {new Date(displayDate).toLocaleDateString("en-US", { month: 'short', day: 'numeric', year: 'numeric' })}
+                          <div
+                            className="flex items-center gap-1.5"
+                            title="Publish Date"
+                          >
+                            <CalendarDays
+                              size={16}
+                              className="text-slate-400"
+                            />
+                            {new Date(displayDate).toLocaleDateString(
+                              "en-US",
+                              {
+                                month: "short",
+                                day: "numeric",
+                                year: "numeric",
+                              }
+                            )}
                           </div>
 
-                          <div className="flex items-center gap-1.5" title="Target Audience">
+                          <div
+                            className="flex items-center gap-1.5"
+                            title="Target Audience"
+                          >
                             <Users size={16} className="text-slate-400" />
-                            <span className="capitalize">{notice.targetAudience?.toLowerCase() || "All"}</span>
+                            <span className="capitalize">
+                              {notice.targetAudience?.toLowerCase() || "All"}
+                            </span>
                           </div>
 
-                          <div className="flex items-center gap-1.5" title="Views">
+                          <div
+                            className="flex items-center gap-1.5"
+                            title="Views"
+                          >
                             <Eye size={16} className="text-slate-400" />
                             {notice.views || 0}
                           </div>
@@ -192,29 +227,23 @@ export default function NoticesPage() {
                               {notice.attachments.length} Attachment(s)
                             </div>
                           )}
-
                         </div>
                       </div>
 
-                      {/* ACTION BUTTON */}
-                      <div className="hidden md:flex flex-col items-end shrink-0 pl-4">
-                        <Link
-                           href={`/admin/notices/${notice._id}`}
-                           className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors border border-border-custom bg-card"
-                        >
-                           <FileText size={16} />
-                           View Details
-                        </Link>
+                      {/* CHEVRON — visible on hover */}
+                      <div className="hidden md:flex items-center shrink-0 pl-4 self-center">
+                        <ChevronRight
+                          size={20}
+                          className="text-slate-300 dark:text-slate-600 group-hover:text-indigo-500 dark:group-hover:text-indigo-400 transition-colors"
+                        />
                       </div>
-
                     </div>
-                  </div>
+                  </Link>
                 );
               })}
             </div>
           )}
         </div>
-
       </div>
     </DashboardLayout>
   );

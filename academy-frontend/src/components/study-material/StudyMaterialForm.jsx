@@ -166,6 +166,13 @@ export default function StudyMaterialForm({
   placeholder="Brief description of the material..."
   rows={4}
 />
+<RichTextEditor
+  label="Body Content"
+  value={formData.body}
+  onChange={(html) => handleChange({ target: { name: "body", value: html } })}
+  placeholder="Detailed content..."
+  rows={10}
+/>
 
       {/* Batch & Course */}
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2">

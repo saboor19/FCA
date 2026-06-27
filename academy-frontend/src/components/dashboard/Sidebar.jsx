@@ -105,6 +105,7 @@ const Sidebar = ({ role }) => {
       { name: "Dashboard", href: "/student/dashboard" },
       { name: "Batches", href: "/student/batches" },
       { name: "Assignments", href: "/student/assignments" },
+      { name: "Study Material", href: "/student/study-materials" },
       { name: "Timetable", href: "/student/timetable" },
       { name: "Attendance", href: "/student/attendance" },
       { name: "Fees", href: "/student/fees" },
