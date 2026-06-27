@@ -68,6 +68,8 @@ export default function StudyMaterialDetails({
     try { await onDelete(); } finally { setIsDeleting(false); }
   }, [onDelete]);
 
+  
+
   /* ── Tabs ── */
   const tabs = [
     { id: "overview", label: "Overview", icon: FileText },

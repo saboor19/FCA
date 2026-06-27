@@ -185,7 +185,7 @@ export const previewAttachment =
 
 window.open(
 
-`${process.env.NEXT_PUBLIC_API_URL}/api/teacher/study-materials/${id}/attachments/${attachmentId}/preview`,
+`${process.env.NEXT_PUBLIC_API_URL}/teacher/study-materials/${id}/attachments/${attachmentId}/preview`,
 
 "_blank"
 
@@ -198,7 +198,7 @@ export const downloadAttachment =
 
 window.open(
 
-`${process.env.NEXT_PUBLIC_API_URL}/api/teacher/study-materials/${id}/attachments/${attachmentId}/download`
+`${process.env.NEXT_PUBLIC_API_URL}/teacher/study-materials/${id}/attachments/${attachmentId}/download`
 
 );
 

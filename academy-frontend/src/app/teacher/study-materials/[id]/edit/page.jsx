@@ -8,17 +8,17 @@ import {
   CheckCircle2,
   FileText,
   Loader2,
+  FileArchive,
+  Download,
+  Eye,
+  Trash2,
+  X,
 } from "lucide-react";
 
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import StudyMaterialForm from "@/components/study-material/StudyMaterialForm";
 import studyMaterialService from "@/services/teacher/studyMaterialService";
 import { getAssignedBatches } from "@/services/teacher/batchService";
-
-/* ═══════════════════════════════════════════════════════════════
-   TEACHER STUDY MATERIAL EDIT PAGE
-   Edit existing material • Reuse StudyMaterialForm • Toast UX
-   ═══════════════════════════════════════════════════════════════ */
 
 export default function TeacherStudyMaterialEditPage() {
   const router = useRouter();
@@ -31,7 +31,6 @@ export default function TeacherStudyMaterialEditPage() {
   const [error, setError] = useState(null);
   const [toast, setToast] = useState(null);
 
-  /* ── Fetch material + assigned batches ── */
   useEffect(() => {
     if (id) fetchData();
   }, [id]);
@@ -56,13 +55,11 @@ export default function TeacherStudyMaterialEditPage() {
     }
   }, [id]);
 
-  /* ── Toast helper ── */
   const showToast = useCallback((type, message) => {
     setToast({ type, message });
     setTimeout(() => setToast(null), 4000);
   }, []);
 
-  /* ── Map material to form initial values ── */
   const getInitialValues = useCallback(() => {
     if (!material) return {};
 
@@ -73,33 +70,37 @@ export default function TeacherStudyMaterialEditPage() {
       course: material.course?._id || material.course || "",
       moduleId: material.moduleId || "",
       visibility: material.visibility || "BATCH_ONLY",
-      // Note: file is not editable here (attachments managed separately)
+      sharedBatches: material.sharedBatches?.map((b) => b._id || b) || [],
       file: null,
     };
   }, [material]);
 
-  /* ── Handle update ── */
+  /* ── Handle update + optional new file upload ── */
   const handleSubmit = useCallback(
     async (formData) => {
       try {
         setSaving(true);
 
-        // Only send editable fields (matches your controller's allowedFields)
         const payload = {
           title: formData.title,
           summary: formData.summary,
           visibility: formData.visibility,
-          // Include these if your API allows changing them:
-          // course: formData.course,
-          // moduleId: formData.moduleId,
-          // sharedBatches: formData.sharedBatches,
+          sharedBatches: formData.sharedBatches,
         };
 
+        // Step 1: Update material fields
         await studyMaterialService.updateStudyMaterial(id, payload);
 
+        // Step 2: Upload new attachment if provided
+        if (formData.file) {
+          await studyMaterialService.uploadAttachment(id, formData.file);
+        }
+
         showToast("success", "Study material updated successfully");
-        
-        // Optional: redirect to details page after short delay
+
+        // Refresh material to show new attachments
+        await fetchData();
+
         setTimeout(() => {
           router.push(`/teacher/study-materials/${id}`);
         }, 1200);
@@ -113,14 +114,41 @@ export default function TeacherStudyMaterialEditPage() {
         setSaving(false);
       }
     },
-    [id, router, showToast]
+    [id, router, showToast, fetchData]
   );
 
   const handleCancel = useCallback(() => {
     router.push(`/teacher/study-materials/${id}`);
   }, [router, id]);
 
-  /* ── Render ── */
+  const handleDeleteAttachment = useCallback(
+    async (attachmentId) => {
+      if (!window.confirm("Delete this attachment?")) return;
+      try {
+        await studyMaterialService.deleteAttachment(id, attachmentId);
+        showToast("success", "Attachment deleted");
+        fetchData();
+      } catch (err) {
+        showToast("error", "Failed to delete attachment");
+      }
+    },
+    [id, showToast, fetchData]
+  );
+
+  const handlePreviewAttachment = useCallback(
+    (attachment) => {
+      studyMaterialService.previewAttachment(id, attachment._id);
+    },
+    [id]
+  );
+
+  const handleDownloadAttachment = useCallback(
+    (attachment) => {
+      studyMaterialService.downloadAttachment(id, attachment._id);
+    },
+    [id]
+  );
+
   return (
     <DashboardLayout role="TEACHER">
       <div className="relative mx-auto max-w-4xl space-y-6">
@@ -172,28 +200,100 @@ export default function TeacherStudyMaterialEditPage() {
         ) : !material ? (
           <NotFoundState onBack={() => router.push("/teacher/study-materials")} />
         ) : (
-          <div className="rounded-2xl border border-[var(--border)] bg-[var(--card)] p-6 shadow-sm sm:p-8">
-            <div className="mb-6 flex items-center gap-3 rounded-xl bg-[var(--muted)]/50 p-4">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[var(--primary)]/10">
-                <FileText className="h-5 w-5 text-[var(--primary)]" />
+          <div className="space-y-6">
+            {/* Material meta card */}
+            <div className="rounded-2xl border border-[var(--border)] bg-[var(--card)] p-6 shadow-sm sm:p-8">
+              <div className="mb-6 flex items-center gap-3 rounded-xl bg-[var(--muted)]/50 p-4">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[var(--primary)]/10">
+                  <FileText className="h-5 w-5 text-[var(--primary)]" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-[var(--foreground)]">
+                    Material #{material.materialNumber}
+                  </p>
+                  <p className="text-xs text-[var(--muted-foreground)]">
+                    Status: {material.status} • Version {material.version} •{" "}
+                    {material.attachments?.length || 0} attachment(s)
+                  </p>
+                </div>
               </div>
-              <div>
-                <p className="text-sm font-medium text-[var(--foreground)]">
-                  Material #{material.materialNumber}
-                </p>
-                <p className="text-xs text-[var(--muted-foreground)]">
-                  Status: {material.status} • Version {material.version}
-                </p>
-              </div>
+
+              <StudyMaterialForm
+                initialValues={getInitialValues()}
+                batches={batches}
+                loading={saving}
+                onSubmit={handleSubmit}
+                onCancel={handleCancel}
+              />
             </div>
 
-            <StudyMaterialForm
-              initialValues={getInitialValues()}
-              batches={batches}
-              loading={saving}
-              onSubmit={handleSubmit}
-              onCancel={handleCancel}
-            />
+            {/* Existing Attachments */}
+            {material.attachments?.length > 0 && (
+              <div className="rounded-2xl border border-[var(--border)] bg-[var(--card)] p-6 shadow-sm sm:p-8">
+                <div className="mb-4 flex items-center gap-2">
+                  <FileArchive className="h-5 w-5 text-[var(--primary)]" />
+                  <h2 className="text-lg font-semibold text-[var(--foreground)]">
+                    Existing Attachments
+                  </h2>
+                  <span className="rounded-full bg-[var(--muted)] px-2.5 py-0.5 text-xs font-medium text-[var(--muted-foreground)]">
+                    {material.attachments.length}
+                  </span>
+                </div>
+
+                <ul className="divide-y divide-[var(--border)]" role="list">
+                  {material.attachments.map((file, index) => (
+                    <li
+                      key={file._id}
+                      className="group flex items-center gap-4 py-4 transition-colors first:pt-0 last:pb-0"
+                    >
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--primary)]/10 text-[var(--primary)] font-bold text-sm">
+                        {index + 1}
+                      </div>
+
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate font-medium text-[var(--foreground)]">
+                          {file.originalName}
+                        </p>
+                        <p className="mt-0.5 text-xs text-[var(--muted-foreground)]">
+                          {file.extension?.toUpperCase()} • {(file.size / 1024).toFixed(1)} KB
+                          {file.uploadedBy?.userId?.fullName && (
+                            <> • Uploaded by {file.uploadedBy.userId.fullName}</>
+                          )}
+                        </p>
+                      </div>
+
+                      <div className="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100 sm:opacity-100">
+                        {file.isPreviewable && (
+                          <button
+                            onClick={() => handlePreviewAttachment(file)}
+                            className="inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium text-[var(--primary)] transition-colors hover:bg-[var(--primary)]/10"
+                            aria-label={`Preview ${file.originalName}`}
+                          >
+                            <Eye className="h-4 w-4" />
+                            <span className="hidden sm:inline">Preview</span>
+                          </button>
+                        )}
+                        <button
+                          onClick={() => handleDownloadAttachment(file)}
+                          className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--primary)] px-3 py-2 text-sm font-medium text-white transition-all hover:bg-[var(--primary-hover)]"
+                          aria-label={`Download ${file.originalName}`}
+                        >
+                          <Download className="h-4 w-4" />
+                          <span className="hidden sm:inline">Download</span>
+                        </button>
+                        <button
+                          onClick={() => handleDeleteAttachment(file._id)}
+                          className="inline-flex items-center rounded-lg p-2 text-[var(--muted-foreground)] transition-colors hover:bg-red-50 hover:text-red-600"
+                          aria-label={`Delete ${file.originalName}`}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -201,10 +301,7 @@ export default function TeacherStudyMaterialEditPage() {
   );
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   STATES
-   ═══════════════════════════════════════════════════════════════ */
-
+/* ── States ── */
 function LoadingState() {
   return (
     <div className="flex flex-col items-center justify-center rounded-2xl border border-[var(--border)] bg-[var(--card)] py-20">
@@ -226,7 +323,7 @@ function ErrorState({ message, onRetry }) {
       <p className="mt-2 max-w-md text-sm text-red-600 dark:text-red-400">{message}</p>
       <button
         onClick={onRetry}
-        className="mt-6 inline-flex items-center gap-2 rounded-lg bg-red-600 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2"
+        className="mt-6 inline-flex items-center gap-2 rounded-lg bg-red-600 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-red-700"
       >
         Try Again
       </button>
@@ -248,7 +345,7 @@ function NotFoundState({ onBack }) {
       </p>
       <button
         onClick={onBack}
-        className="mt-6 inline-flex items-center gap-2 rounded-lg bg-[var(--primary)] px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[var(--primary-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)] focus-visible:ring-offset-2"
+        className="mt-6 inline-flex items-center gap-2 rounded-lg bg-[var(--primary)] px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[var(--primary-hover)]"
       >
         <ArrowLeft className="h-4 w-4" />
         Back to Materials
