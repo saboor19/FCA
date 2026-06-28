@@ -56,12 +56,8 @@ exports.registerUser = async (req, res) => {
         message: "User already exists"
       });
     }
-
-
     // Hash Password
     const hashedPassword = await bcrypt.hash(password, 10);
-
-    
     // Create User
     const user = await User.create({
       fullName,
@@ -70,11 +66,8 @@ exports.registerUser = async (req, res) => {
       role
     });
 
-
     // Generate Token
     const token = generateToken(user._id, user.role);
-
-
     res.status(201).json({
       message: "User registered successfully",
       token,
@@ -144,6 +137,8 @@ res.cookie("token", token, {
     });
   }
 };
+
+
 exports.logoutUser = async(req,res) => {
 
   try{

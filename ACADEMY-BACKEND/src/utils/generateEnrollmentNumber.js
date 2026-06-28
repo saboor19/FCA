@@ -1,32 +1,23 @@
-const Counter =
-require("../models/Counter");
+const Counter = require("../models/Counter");
 
 exports.generateEnrollmentNumber =
-async() => {
-
+async(session=null)=>{
   const counter =
-    await Counter.findOneAndUpdate(
+  await Counter.findOneAndUpdate({ name:"studentEnrollment" },
+    {
+      $inc:{sequence:1}
+    },
 
-      {
-        name:"studentEnrollment"
-      },
+    {
+      new:true,
+      upsert:true,
+      session
+    }
 
-      {
-        $inc:{
-          sequence:1
-        }
-      },
-
-      {
-        new:true,
-        upsert:true
-      }
-
-    );
+  );
 
   const year =
-    new Date()
-    .getFullYear();
+  new Date().getFullYear();
 
   return `FCA-${year}-${String(
     counter.sequence

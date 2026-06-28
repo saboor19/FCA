@@ -72,6 +72,10 @@ app.use("/api/auth", authRoutes);
 app.use("/api/courses", publicCourseRoutes);
 app.use("/api/public/enrollment",require("./routes/public/enrollementRoutes"));
 
+//--------------SALES--------------
+app.use("/api/salesteam/leads",require("./routes/salesteam/leadRoutes"));
+
+
 //---------------- admin routes
 app.use("/api/admin/courses", courseRoutes);
 app.use( "/api/admin/students", studentRoutes );
@@ -81,6 +85,9 @@ app.use( "/api/admin/attendance", attendanceRoutes);
 app.use("/api/teachers/",adminTeacherRoutes)
 app.use( "/api/admin/notices", require("./routes/admin/noticeRoutes") );
 app.use( "/api/admin/timetables", require("./routes/admin/timetableRoutes"));
+app.use( "/api/admin/sales", require("./routes/admin/salesTeamRoutes"));
+
+
 app.use( "/api/admin/fees", feeRoutes );
 app.use("/api/admin/finance",financeRoutes);
 app.use("/api/admin/admissions",require("./routes/admin/admissionRoutes"));

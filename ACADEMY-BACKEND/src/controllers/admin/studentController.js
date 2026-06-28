@@ -1,11 +1,14 @@
 const User = require("../../models/User");
 const Student = require("../../models/Student");
 const bcrypt = require("bcryptjs");
-
+const generateEmnrollmentNumber=require("../../utils/generateEnrollmentNumber");
 
 
 //-------------CREATE STUDENT --------------------
 exports.createStudent = async(req,res) => {
+
+const enrollmentNo =
+await generateEnrollmentNumber(session);
 
   try {
 
@@ -13,7 +16,6 @@ exports.createStudent = async(req,res) => {
       fullName,
       email,
       password,
-      enrollmentNo,
       batch,
       guardianName,
       guardianPhone
