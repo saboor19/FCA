@@ -73,7 +73,7 @@ app.use("/api/courses", publicCourseRoutes);
 app.use("/api/public/enrollment",require("./routes/public/enrollementRoutes"));
 
 //--------------SALES--------------
-app.use("/api/salesteam/leads",require("./routes/salesteam/leadRoutes"));
+app.use("/api/sales/leads",require("./routes/salesteam/leadRoutes"));
 
 
 //---------------- admin routes

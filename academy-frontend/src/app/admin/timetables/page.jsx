@@ -15,9 +15,19 @@ import {
   Search,
 } from "lucide-react";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
-import { getTimetables, deleteTimetable } from "@/services/admin/timetableService";
+import {
+  getTimetables,
+  deleteTimetable,
+} from "@/services/admin/timetableService";
 
-const DAYS = ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"];
+const DAYS = [
+  "MONDAY",
+  "TUESDAY",
+  "WEDNESDAY",
+  "THURSDAY",
+  "FRIDAY",
+  "SATURDAY",
+];
 const DAY_SHORT = {
   MONDAY: "Mon",
   TUESDAY: "Tue",
@@ -28,12 +38,18 @@ const DAY_SHORT = {
 };
 
 const DAY_COLOR = {
-  MONDAY:    "bg-blue-50   text-blue-700   border-blue-200   dark:bg-blue-950  dark:text-blue-300  dark:border-blue-800",
-  TUESDAY:   "bg-violet-50 text-violet-700 border-violet-200 dark:bg-violet-950 dark:text-violet-300 dark:border-violet-800",
-  WEDNESDAY: "bg-amber-50  text-amber-700  border-amber-200  dark:bg-amber-950 dark:text-amber-300  dark:border-amber-800",
-  THURSDAY:  "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950 dark:text-emerald-300 dark:border-emerald-800",
-  FRIDAY:    "bg-rose-50   text-rose-700   border-rose-200   dark:bg-rose-950  dark:text-rose-300   dark:border-rose-800",
-  SATURDAY:  "bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-950 dark:text-orange-300 dark:border-orange-800",
+  MONDAY:
+    "bg-blue-50   text-blue-700   border-blue-200   dark:bg-blue-950  dark:text-blue-300  dark:border-blue-800",
+  TUESDAY:
+    "bg-violet-50 text-violet-700 border-violet-200 dark:bg-violet-950 dark:text-violet-300 dark:border-violet-800",
+  WEDNESDAY:
+    "bg-amber-50  text-amber-700  border-amber-200  dark:bg-amber-950 dark:text-amber-300  dark:border-amber-800",
+  THURSDAY:
+    "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950 dark:text-emerald-300 dark:border-emerald-800",
+  FRIDAY:
+    "bg-rose-50   text-rose-700   border-rose-200   dark:bg-rose-950  dark:text-rose-300   dark:border-rose-800",
+  SATURDAY:
+    "bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-950 dark:text-orange-300 dark:border-orange-800",
 };
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -87,7 +103,10 @@ function FilterChip({ label, active, onClick, onClear }) {
         <span
           role="button"
           aria-label={`Clear ${label} filter`}
-          onClick={(e) => { e.stopPropagation(); onClear(); }}
+          onClick={(e) => {
+            e.stopPropagation();
+            onClear();
+          }}
           className="ml-0.5 opacity-70 hover:opacity-100"
         >
           <X className="w-3 h-3" />
@@ -99,17 +118,31 @@ function FilterChip({ label, active, onClick, onClear }) {
 
 function FilterSection({ timetables, filters, setFilters }) {
   const batches = useMemo(
-    () => unique(timetables, (t) => t.batch?._id).map((t) => ({ id: t.batch._id, name: t.batch.name })),
-    [timetables]
+    () =>
+      unique(timetables, (t) => t.batch?._id).map((t) => ({
+        id: t.batch._id,
+        name: t.batch.name,
+      })),
+    [timetables],
   );
   const teachers = useMemo(
-    () => unique(timetables, (t) => t.teacher?._id).map((t) => ({ id: t.teacher._id, name: t.teacher?.userId?.fullName })),
-    [timetables]
+    () =>
+      unique(timetables, (t) => t.teacher?._id).map((t) => ({
+        id: t.teacher._id,
+        name: t.teacher?.userId?.fullName,
+      })),
+    [timetables],
   );
 
-  const activeCount = [filters.batch, filters.teacher, filters.day, filters.search].filter(Boolean).length;
+  const activeCount = [
+    filters.batch,
+    filters.teacher,
+    filters.day,
+    filters.search,
+  ].filter(Boolean).length;
 
-  const clearAll = () => setFilters({ batch: "", teacher: "", day: "", search: "" });
+  const clearAll = () =>
+    setFilters({ batch: "", teacher: "", day: "", search: "" });
 
   return (
     <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden">
@@ -144,7 +177,9 @@ function FilterSection({ timetables, filters, setFilters }) {
             type="text"
             placeholder="Search subject or room…"
             value={filters.search}
-            onChange={(e) => setFilters((p) => ({ ...p, search: e.target.value }))}
+            onChange={(e) =>
+              setFilters((p) => ({ ...p, search: e.target.value }))
+            }
             className="w-full pl-8 pr-3 py-2 text-sm border border-border rounded-lg bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-all"
           />
           {filters.search && (
@@ -160,14 +195,18 @@ function FilterSection({ timetables, filters, setFilters }) {
 
         {/* Day filter */}
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">Day</p>
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">
+            Day
+          </p>
           <div className="flex flex-wrap gap-1.5">
             {DAYS.map((day) => (
               <FilterChip
                 key={day}
                 label={DAY_SHORT[day]}
                 active={filters.day === day}
-                onClick={() => setFilters((p) => ({ ...p, day: p.day === day ? "" : day }))}
+                onClick={() =>
+                  setFilters((p) => ({ ...p, day: p.day === day ? "" : day }))
+                }
                 onClear={() => setFilters((p) => ({ ...p, day: "" }))}
               />
             ))}
@@ -177,14 +216,21 @@ function FilterSection({ timetables, filters, setFilters }) {
         {/* Batch filter */}
         {batches.length > 0 && (
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">Batch</p>
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">
+              Batch
+            </p>
             <div className="flex flex-wrap gap-1.5">
               {batches.map((b) => (
                 <FilterChip
                   key={b.id}
                   label={b.name}
                   active={filters.batch === b.id}
-                  onClick={() => setFilters((p) => ({ ...p, batch: p.batch === b.id ? "" : b.id }))}
+                  onClick={() =>
+                    setFilters((p) => ({
+                      ...p,
+                      batch: p.batch === b.id ? "" : b.id,
+                    }))
+                  }
                   onClear={() => setFilters((p) => ({ ...p, batch: "" }))}
                 />
               ))}
@@ -195,14 +241,21 @@ function FilterSection({ timetables, filters, setFilters }) {
         {/* Teacher filter */}
         {teachers.length > 0 && (
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">Teacher</p>
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">
+              Teacher
+            </p>
             <div className="flex flex-wrap gap-1.5">
               {teachers.map((t) => (
                 <FilterChip
                   key={t.id}
                   label={t.name}
                   active={filters.teacher === t.id}
-                  onClick={() => setFilters((p) => ({ ...p, teacher: p.teacher === t.id ? "" : t.id }))}
+                  onClick={() =>
+                    setFilters((p) => ({
+                      ...p,
+                      teacher: p.teacher === t.id ? "" : t.id,
+                    }))
+                  }
                   onClear={() => setFilters((p) => ({ ...p, teacher: "" }))}
                 />
               ))}
@@ -216,20 +269,27 @@ function FilterSection({ timetables, filters, setFilters }) {
 
 function TimetableCard({ item, onDelete }) {
   const duration = calcDuration(item.startTime, item.endTime);
-  const dayColor = DAY_COLOR[item.dayOfWeek] ?? "bg-muted text-muted-foreground border-border";
+  const dayColor =
+    DAY_COLOR[item.dayOfWeek] ?? "bg-muted text-muted-foreground border-border";
 
   return (
     <div className="group bg-card border border-border rounded-xl shadow-sm hover:shadow-md hover:border-border/80 transition-all duration-200 overflow-hidden">
       {/* Left accent bar keyed to day */}
-      <div className={`h-1 w-full ${dayColor.split(" ")[0].replace("bg-", "bg-").replace("50", "400").replace("950", "600")}`} />
+      <div
+        className={`h-1 w-full ${dayColor.split(" ")[0].replace("bg-", "bg-").replace("50", "400").replace("950", "600")}`}
+      />
 
       <div className="px-5 py-4 flex items-start justify-between gap-4">
         {/* Main content */}
         <div className="flex-1 min-w-0">
           {/* Subject + day badge */}
           <div className="flex items-center gap-2.5 flex-wrap">
-            <h2 className="text-base font-semibold text-foreground truncate">{item.subject}</h2>
-            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-medium border ${dayColor}`}>
+            <h2 className="text-base font-semibold text-foreground truncate">
+              {item.subject}
+            </h2>
+            <span
+              className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-medium border ${dayColor}`}
+            >
               {item.dayOfWeek}
             </span>
           </div>
@@ -237,7 +297,9 @@ function TimetableCard({ item, onDelete }) {
           {/* Batch & course */}
           <p className="text-sm text-primary font-medium mt-1 truncate">
             {item.batch?.name}
-            {item.batch?.name && item.course?.title && <span className="text-muted-foreground font-normal"> · </span>}
+            {item.batch?.name && item.course?.title && (
+              <span className="text-muted-foreground font-normal"> · </span>
+            )}
             {item.course?.title}
           </p>
 
@@ -286,7 +348,9 @@ function EmptyState({ filtered }) {
         {filtered ? "No slots match your filters" : "No timetable slots yet"}
       </h2>
       <p className="text-sm text-muted-foreground mt-1">
-        {filtered ? "Try adjusting or clearing the active filters." : "Create your first slot to get started."}
+        {filtered
+          ? "Try adjusting or clearing the active filters."
+          : "Create your first slot to get started."}
       </p>
     </div>
   );
@@ -297,7 +361,12 @@ function EmptyState({ filtered }) {
 export default function TimetablesPage() {
   const [timetables, setTimetables] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filters, setFilters] = useState({ batch: "", teacher: "", day: "", search: "" });
+  const [filters, setFilters] = useState({
+    batch: "",
+    teacher: "",
+    day: "",
+    search: "",
+  });
 
   useEffect(() => {
     fetchTimetables();
@@ -328,7 +397,8 @@ export default function TimetablesPage() {
   const filtered = useMemo(() => {
     return timetables.filter((item) => {
       if (filters.batch && item.batch?._id !== filters.batch) return false;
-      if (filters.teacher && item.teacher?._id !== filters.teacher) return false;
+      if (filters.teacher && item.teacher?._id !== filters.teacher)
+        return false;
       if (filters.day && item.dayOfWeek !== filters.day) return false;
       if (filters.search) {
         const q = filters.search.toLowerCase();
@@ -351,7 +421,10 @@ export default function TimetablesPage() {
       groups[d].push(item);
     });
     // Sort groups by DAYS order
-    return DAYS.filter((d) => groups[d]).map((d) => ({ day: d, items: groups[d] }));
+    return DAYS.filter((d) => groups[d]).map((d) => ({
+      day: d,
+      items: groups[d],
+    }));
   }, [filtered]);
 
   return (
@@ -366,9 +439,13 @@ export default function TimetablesPage() {
               <CalendarDays className="w-5 h-5" />
             </div>
             <div>
-              <h1 className="text-xl font-semibold text-foreground">Timetable Management</h1>
+              <h1 className="text-xl font-semibold text-foreground">
+                Timetable Management
+              </h1>
               <p className="text-sm text-muted-foreground mt-0.5">
-                {loading ? "Loading…" : `${timetables.length} total slot${timetables.length !== 1 ? "s" : ""}${isFiltered ? ` · ${filtered.length} shown` : ""}`}
+                {loading
+                  ? "Loading…"
+                  : `${timetables.length} total slot${timetables.length !== 1 ? "s" : ""}${isFiltered ? ` · ${filtered.length} shown` : ""}`}
               </p>
             </div>
           </div>
@@ -399,7 +476,6 @@ export default function TimetablesPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-5 items-start">
-
             {/* ── Filters sidebar ─────────────────────────────────── */}
             <div className="lg:sticky lg:top-4">
               <FilterSection
@@ -418,7 +494,9 @@ export default function TimetablesPage() {
                   <div key={day}>
                     {/* Day group header */}
                     <div className="flex items-center gap-2.5 mb-3">
-                      <span className={`text-xs font-semibold px-2.5 py-1 rounded-full border ${DAY_COLOR[day]}`}>
+                      <span
+                        className={`text-xs font-semibold px-2.5 py-1 rounded-full border ${DAY_COLOR[day]}`}
+                      >
                         {day}
                       </span>
                       <span className="text-xs text-muted-foreground">

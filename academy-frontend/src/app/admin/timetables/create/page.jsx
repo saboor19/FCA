@@ -1,172 +1,98 @@
 "use client";
 
-import {
-  useEffect,
-  useState
-} from "react";
+import { useEffect, useState } from "react";
 
-import {
-  useRouter
-} from "next/navigation";
+import { useRouter } from "next/navigation";
 
-import {
+import { Loader2, CalendarPlus } from "lucide-react";
 
-  Loader2,
-  CalendarPlus
+import DashboardLayout from "@/components/dashboard/DashboardLayout";
 
-} from "lucide-react";
+import { createTimetable } from "@/services/admin/timetableService";
 
-import DashboardLayout
-from "@/components/dashboard/DashboardLayout";
+import { getTeachers } from "@/services/admin/teacherService";
 
-import {
-  createTimetable
-} from "@/services/admin/timetableService";
+import { getBatches } from "@/services/admin/batchService";
 
-import {
-  getTeachers
-} from "@/services/admin/teacherService";
+import { getCourses } from "@/services/admin/courseService";
 
-import {
-  getBatches
-} from "@/services/admin/batchService";
-
-import {
-  getCourses
-} from "@/services/admin/courseService";
-
-export default function CreateTimetablePage(){
-
+export default function CreateTimetablePage() {
   const router = useRouter();
 
-  const [loading,setLoading] =
-    useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const [initialLoading,setInitialLoading] =
-    useState(true);
+  const [initialLoading, setInitialLoading] = useState(true);
 
-  const [teachers,setTeachers] =
-    useState([]);
+  const [teachers, setTeachers] = useState([]);
 
-  const [batches,setBatches] =
-    useState([]);
+  const [batches, setBatches] = useState([]);
 
-  const [courses,setCourses] =
-    useState([]);
+  const [courses, setCourses] = useState([]);
 
-  const [formData,setFormData] =
-    useState({
-
-      batch:"",
-      course:"",
-      teacher:"",
-      subject:"",
-      dayOfWeek:"MONDAY",
-      startTime:"",
-      endTime:"",
-      roomNumber:"",
-      meetingLink:"",
-      mode:"OFFLINE"
-
-    });
+  const [formData, setFormData] = useState({
+    batch: "",
+    course: "",
+    teacher: "",
+    subject: "",
+    dayOfWeek: "MONDAY",
+    startTime: "",
+    endTime: "",
+    roomNumber: "",
+    meetingLink: "",
+    mode: "OFFLINE",
+  });
 
   useEffect(() => {
-
     fetchInitialData();
+  }, []);
 
-  },[]);
-
-  const fetchInitialData = async() => {
-
-    try{
-
+  const fetchInitialData = async () => {
+    try {
       setInitialLoading(true);
 
-      const [
+      const [teachersResponse, batchesResponse, coursesResponse] =
+        await Promise.all([getTeachers(), getBatches(), getCourses()]);
 
-        teachersResponse,
-        batchesResponse,
-        coursesResponse
+      setTeachers(teachersResponse.data || []);
 
-      ] = await Promise.all([
+      setBatches(batchesResponse.data || []);
 
-        getTeachers(),
-        getBatches(),
-        getCourses()
-
-      ]);
-
-      setTeachers(
-        teachersResponse.data || []
-      );
-
-      setBatches(
-        batchesResponse.data || []
-      );
-
-      setCourses(
-        coursesResponse.data || []
-      );
-
-    }catch(error){
-
+      setCourses(coursesResponse.data || []);
+    } catch (error) {
       console.log(error);
-
-    }finally{
-
+    } finally {
       setInitialLoading(false);
-
     }
-
   };
 
   const handleChange = (e) => {
-
     setFormData({
-
       ...formData,
 
-      [e.target.name]:
-      e.target.value
-
+      [e.target.name]: e.target.value,
     });
-
   };
 
-  const handleSubmit = async(e) => {
-
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    try{
-
+    try {
       setLoading(true);
 
       await createTimetable(formData);
 
-      router.push(
-        "/admin/timetables"
-      );
-
-    }catch(error){
-
+      router.push("/admin/timetables");
+    } catch (error) {
       console.log(error);
-
-    }finally{
-
+    } finally {
       setLoading(false);
-
     }
-
   };
 
-  if(initialLoading){
-
-    return(
-
+  if (initialLoading) {
+    return (
       <DashboardLayout role="ADMIN">
-
         <div className="flex justify-center py-20">
-
           <Loader2
             className="
               w-8
@@ -174,39 +100,25 @@ export default function CreateTimetablePage(){
               animate-spin
             "
           />
-
         </div>
-
       </DashboardLayout>
-
     );
-
   }
 
-  return(
-
+  return (
     <DashboardLayout role="ADMIN">
-
       <div className="max-w-5xl mx-auto space-y-8">
-
         {/* HEADER */}
 
         <div>
-
           <h1 className="text-3xl font-bold flex items-center gap-3">
-
             <CalendarPlus className="w-8 h-8" />
-
             Create Timetable Slot
-
           </h1>
 
           <p className="text-muted-foreground mt-2">
-
             Schedule classes for batches and teachers.
-
           </p>
-
         </div>
 
         {/* FORM */}
@@ -220,25 +132,14 @@ export default function CreateTimetablePage(){
             shadow-sm
           "
         >
-
-          <form
-            onSubmit={handleSubmit}
-            className="space-y-8"
-          >
-
+          <form onSubmit={handleSubmit} className="space-y-8">
             {/* GRID */}
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
               {/* BATCH */}
 
               <div>
-
-                <label className="block mb-2 font-medium">
-
-                  Batch
-
-                </label>
+                <label className="block mb-2 font-medium">Batch</label>
 
                 <select
                   name="batch"
@@ -253,39 +154,20 @@ export default function CreateTimetablePage(){
                     py-3
                   "
                 >
+                  <option value="">Select Batch</option>
 
-                  <option value="">
-                    Select Batch
-                  </option>
-
-                  {
-                    batches.map((batch) => (
-
-                      <option
-                        key={batch._id}
-                        value={batch._id}
-                      >
-
-                        {batch.name}
-
-                      </option>
-
-                    ))
-                  }
-
+                  {batches.map((batch) => (
+                    <option key={batch._id} value={batch._id}>
+                      {batch.name}
+                    </option>
+                  ))}
                 </select>
-
               </div>
 
               {/* COURSE */}
 
               <div>
-
-                <label className="block mb-2 font-medium">
-
-                  Course
-
-                </label>
+                <label className="block mb-2 font-medium">Course</label>
 
                 <select
                   name="course"
@@ -300,39 +182,20 @@ export default function CreateTimetablePage(){
                     py-3
                   "
                 >
+                  <option value="">Select Course</option>
 
-                  <option value="">
-                    Select Course
-                  </option>
-
-                  {
-                    courses.map((course) => (
-
-                      <option
-                        key={course._id}
-                        value={course._id}
-                      >
-
-                        {course.title}
-
-                      </option>
-
-                    ))
-                  }
-
+                  {courses.map((course) => (
+                    <option key={course._id} value={course._id}>
+                      {course.title}
+                    </option>
+                  ))}
                 </select>
-
               </div>
 
               {/* TEACHER */}
 
               <div>
-
-                <label className="block mb-2 font-medium">
-
-                  Teacher
-
-                </label>
+                <label className="block mb-2 font-medium">Teacher</label>
 
                 <select
                   name="teacher"
@@ -347,41 +210,20 @@ export default function CreateTimetablePage(){
                     py-3
                   "
                 >
+                  <option value="">Select Teacher</option>
 
-                  <option value="">
-                    Select Teacher
-                  </option>
-
-                  {
-                    teachers.map((teacher) => (
-
-                      <option
-                        key={teacher._id}
-                        value={teacher._id}
-                      >
-
-                        {
-                          teacher.userId?.fullName
-                        }
-
-                      </option>
-
-                    ))
-                  }
-
+                  {teachers.map((teacher) => (
+                    <option key={teacher._id} value={teacher._id}>
+                      {teacher.userId?.fullName}
+                    </option>
+                  ))}
                 </select>
-
               </div>
 
               {/* SUBJECT */}
 
               <div>
-
-                <label className="block mb-2 font-medium">
-
-                  Subject
-
-                </label>
+                <label className="block mb-2 font-medium">Subject</label>
 
                 <input
                   type="text"
@@ -398,18 +240,12 @@ export default function CreateTimetablePage(){
                     py-3
                   "
                 />
-
               </div>
 
               {/* DAY */}
 
               <div>
-
-                <label className="block mb-2 font-medium">
-
-                  Day
-
-                </label>
+                <label className="block mb-2 font-medium">Day</label>
 
                 <select
                   name="dayOfWeek"
@@ -423,45 +259,26 @@ export default function CreateTimetablePage(){
                     py-3
                   "
                 >
-
-                  {
-                    [
-
-                      "MONDAY",
-                      "TUESDAY",
-                      "WEDNESDAY",
-                      "THURSDAY",
-                      "FRIDAY",
-                      "SATURDAY",
-                      "SUNDAY"
-
-                    ].map((day) => (
-
-                      <option
-                        key={day}
-                        value={day}
-                      >
-
-                        {day}
-
-                      </option>
-
-                    ))
-                  }
-
+                  {[
+                    "MONDAY",
+                    "TUESDAY",
+                    "WEDNESDAY",
+                    "THURSDAY",
+                    "FRIDAY",
+                    "SATURDAY",
+                    "SUNDAY",
+                  ].map((day) => (
+                    <option key={day} value={day}>
+                      {day}
+                    </option>
+                  ))}
                 </select>
-
               </div>
 
               {/* MODE */}
 
               <div>
-
-                <label className="block mb-2 font-medium">
-
-                  Mode
-
-                </label>
+                <label className="block mb-2 font-medium">Mode</label>
 
                 <select
                   name="mode"
@@ -475,32 +292,18 @@ export default function CreateTimetablePage(){
                     py-3
                   "
                 >
+                  <option value="OFFLINE">OFFLINE</option>
 
-                  <option value="OFFLINE">
-                    OFFLINE
-                  </option>
+                  <option value="ONLINE">ONLINE</option>
 
-                  <option value="ONLINE">
-                    ONLINE
-                  </option>
-
-                  <option value="HYBRID">
-                    HYBRID
-                  </option>
-
+                  <option value="HYBRID">HYBRID</option>
                 </select>
-
               </div>
 
               {/* START TIME */}
 
               <div>
-
-                <label className="block mb-2 font-medium">
-
-                  Start Time
-
-                </label>
+                <label className="block mb-2 font-medium">Start Time</label>
 
                 <input
                   type="time"
@@ -516,18 +319,12 @@ export default function CreateTimetablePage(){
                     py-3
                   "
                 />
-
               </div>
 
               {/* END TIME */}
 
               <div>
-
-                <label className="block mb-2 font-medium">
-
-                  End Time
-
-                </label>
+                <label className="block mb-2 font-medium">End Time</label>
 
                 <input
                   type="time"
@@ -543,18 +340,12 @@ export default function CreateTimetablePage(){
                     py-3
                   "
                 />
-
               </div>
 
               {/* ROOM */}
 
               <div>
-
-                <label className="block mb-2 font-medium">
-
-                  Room Number
-
-                </label>
+                <label className="block mb-2 font-medium">Room Number</label>
 
                 <input
                   type="text"
@@ -569,18 +360,12 @@ export default function CreateTimetablePage(){
                     py-3
                   "
                 />
-
               </div>
 
               {/* MEETING */}
 
               <div>
-
-                <label className="block mb-2 font-medium">
-
-                  Meeting Link
-
-                </label>
+                <label className="block mb-2 font-medium">Meeting Link</label>
 
                 <input
                   type="url"
@@ -595,9 +380,7 @@ export default function CreateTimetablePage(){
                     py-3
                   "
                 />
-
               </div>
-
             </div>
 
             {/* SUBMIT */}
@@ -618,34 +401,24 @@ export default function CreateTimetablePage(){
                 gap-2
               "
             >
-
-              {
-                loading ? (
-                  <>
-                    <Loader2
-                      className="
+              {loading ? (
+                <>
+                  <Loader2
+                    className="
                         w-5
                         h-5
                         animate-spin
                       "
-                    />
-                    Creating...
-                  </>
-                ) : (
-                  "Create Timetable Slot"
-                )
-              }
-
+                  />
+                  Creating...
+                </>
+              ) : (
+                "Create Timetable Slot"
+              )}
             </button>
-
           </form>
-
         </div>
-
       </div>
-
     </DashboardLayout>
-
   );
-
 }

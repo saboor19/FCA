@@ -20,7 +20,7 @@ const {
 
 router.use(
   protect,
-  authorizeRoles("ADMIN")
+  authorizeRoles("ADMIN","SALES_TEAM")
 );
 
 router.post("/", createBatch);

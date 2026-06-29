@@ -20,7 +20,7 @@ export default function CreateEnrollmentPage() {
 
   const [formData, setFormData] = useState({
     student: "",
-    batch: ""
+    batch: "",
   });
 
   useEffect(() => {
@@ -32,7 +32,7 @@ export default function CreateEnrollmentPage() {
       setIsFetching(true);
       const [studentsData, batchesData] = await Promise.all([
         getStudents(),
-        getBatches()
+        getBatches(),
       ]);
       setStudents(studentsData.data);
       setBatches(batchesData.data);
@@ -46,7 +46,7 @@ export default function CreateEnrollmentPage() {
   const handleChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
@@ -65,15 +65,16 @@ export default function CreateEnrollmentPage() {
   };
 
   // Base input styling for consistency and theme compatibility
-  const inputStyle = "w-full px-4 py-2.5 rounded-lg border border-border-custom bg-transparent text-foreground placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-shadow appearance-none cursor-pointer";
-  
+  const inputStyle =
+    "w-full px-4 py-2.5 rounded-lg border border-border-custom bg-transparent text-foreground placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-shadow appearance-none cursor-pointer";
+
   // Label styling
-  const labelStyle = "block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5";
+  const labelStyle =
+    "block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5";
 
   return (
     <DashboardLayout role="ADMIN">
       <div className="max-w-3xl">
-        
         {/* BACK BUTTON */}
         <button
           onClick={() => router.back()}
@@ -111,21 +112,30 @@ export default function CreateEnrollmentPage() {
                 required
               >
                 <option value="" className="bg-background text-foreground">
-                  {isFetching ? "Loading students..." : "-- Select a Student --"}
+                  {isFetching
+                    ? "Loading students..."
+                    : "-- Select a Student --"}
                 </option>
                 {students.map((student) => (
-                  <option 
-                    key={student._id} 
+                  <option
+                    key={student._id}
                     value={student._id}
                     className="bg-background text-foreground"
                   >
-                    {student.userId?.fullName} {student.enrollmentNo ? `(${student.enrollmentNo})` : ""}
+                    {student.userId?.fullName}{" "}
+                    {student.enrollmentNo ? `(${student.enrollmentNo})` : ""}
                   </option>
                 ))}
               </select>
               {/* Custom Dropdown Arrow (since appearance is none) */}
               <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-500 dark:text-slate-400">
-                <svg className="h-4 w-4 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                <svg
+                  className="h-4 w-4 fill-current"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                >
+                  <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+                </svg>
               </div>
             </div>
           </div>
@@ -143,11 +153,13 @@ export default function CreateEnrollmentPage() {
                 required
               >
                 <option value="" className="bg-background text-foreground">
-                  {isFetching ? "Loading batches..." : "-- Select an Active Batch --"}
+                  {isFetching
+                    ? "Loading batches..."
+                    : "-- Select an Active Batch --"}
                 </option>
                 {batches.map((batch) => (
-                  <option 
-                    key={batch._id} 
+                  <option
+                    key={batch._id}
                     value={batch._id}
                     className="bg-background text-foreground"
                   >
@@ -156,7 +168,13 @@ export default function CreateEnrollmentPage() {
                 ))}
               </select>
               <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-500 dark:text-slate-400">
-                <svg className="h-4 w-4 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                <svg
+                  className="h-4 w-4 fill-current"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                >
+                  <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+                </svg>
               </div>
             </div>
           </div>
@@ -177,7 +195,6 @@ export default function CreateEnrollmentPage() {
             </button>
           </div>
         </form>
-
       </div>
     </DashboardLayout>
   );

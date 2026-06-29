@@ -48,6 +48,9 @@ export default function LoginForm() {
         router.push("/teacher/dashboard");
       } else if (data.user.role === "ADMIN") {
         router.push("/admin/dashboard");
+      }
+      else if (data.user.role === "SALES_TEAM") {
+        router.push("/admin/sales/dashboard");
       } else {
         setError("Not authorized");
       }

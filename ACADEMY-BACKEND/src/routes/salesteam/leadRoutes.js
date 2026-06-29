@@ -67,12 +67,6 @@ router.put(
     updateLead
 );
 
-// router.delete(
-//     "/:id",
-//     protect,
-//     authorizeRoles("SALES_TEAM"),
-//     deleteLead
-// );
 
 router.put(
     "/:id/convert",
@@ -103,7 +97,6 @@ router.get(
     getLeadActivity
 
 );
-
 
 
 router.put(

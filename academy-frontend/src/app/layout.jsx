@@ -1,36 +1,41 @@
 import "./globals.css";
-import AppNavbar from "@/components/public/AppNavbar";
-import {Providers} from "@/components/providers";
-import {AuthProvider} from "@/context/AuthContext";
+import NavbarWrapper from "@/components/public/NavbarWrapper";
+import { Providers } from "@/components/providers";
+import { AuthProvider } from "@/context/AuthContext";
 import ConditionalFooter from "@/components/public/ConditionalFooter";
 import "leaflet/dist/leaflet.css";
+
 export const metadata = {
-  title:"Academy Web App",
-  description:"Modern academy management platform"
+    title: "Academy Web App",
+    description: "Modern academy management platform"
 };
 
-export default function RootLayout({children}) {
-  return (
-    <html lang="en" suppressHydrationWarning>
+export default function RootLayout({ children }) {
 
-      <body>
+    return (
 
-        <Providers>
+        <html lang="en" suppressHydrationWarning>
 
-          <AuthProvider>
+            <body>
 
-            <AppNavbar />
+                <Providers>
 
-            {children}
+                    <AuthProvider>
 
-          <ConditionalFooter />
+                        <NavbarWrapper />
 
-          </AuthProvider>
+                        {children}
 
-        </Providers>
+                        <ConditionalFooter />
 
-      </body>
+                    </AuthProvider>
 
-    </html>
-  );
+                </Providers>
+
+            </body>
+
+        </html>
+
+    );
+
 }

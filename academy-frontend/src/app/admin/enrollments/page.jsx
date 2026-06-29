@@ -2,20 +2,14 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import {
-  Plus,
-  Trash2,
-  GraduationCap,
-  BookOpen,
-  Calendar
-} from "lucide-react";
+import { Plus, Trash2, GraduationCap, BookOpen, Calendar } from "lucide-react";
 
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import AcademyLoader from "@/components/ui/AcademyLoader";
 
 import {
   getEnrollments,
-  deleteEnrollment
+  deleteEnrollment,
 } from "@/services/admin/enrollmentService";
 
 export default function EnrollmentsPage() {
@@ -82,20 +76,16 @@ export default function EnrollmentsPage() {
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-slate-50 dark:bg-slate-900/50 border-b border-border-custom">
-              {[
-                "Student",
-                "Batch",
-                "Enrolled At",
-                "Status",
-                "Actions"
-              ].map((head) => (
-                <th
-                  key={head}
-                  className="p-4 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider"
-                >
-                  {head}
-                </th>
-              ))}
+              {["Student", "Batch", "Enrolled At", "Status", "Actions"].map(
+                (head) => (
+                  <th
+                    key={head}
+                    className="p-4 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider"
+                  >
+                    {head}
+                  </th>
+                ),
+              )}
             </tr>
           </thead>
 

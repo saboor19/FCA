@@ -2,13 +2,13 @@ const mongoose = require("mongoose");
 
 const {
 
-FOLLOWUP_TYPE,
+  FOLLOWUP_TYPE,
 
-FOLLOWUP_STATUS,
+  FOLLOWUP_STATUS,
 
-CUSTOMER_RESPONSE,
+  CUSTOMER_RESPONSE,
 
-LEAD_STATUS
+  LEAD_STATUS
 
 } = require("../../constants/salesConstants");
 
@@ -17,118 +17,118 @@ LEAD_STATUS
 // --------------------------------------------------
 
 const attachmentSchema =
-new mongoose.Schema({
+  new mongoose.Schema({
 
-  fileId:{
-    type:mongoose.Schema.Types.ObjectId
-  },
+    fileId: {
+      type: mongoose.Schema.Types.ObjectId
+    },
 
-  filename:String,
+    filename: String,
 
-  contentType:String
+    contentType: String
 
-},{
-  _id:false
-});
+  }, {
+    _id: false
+  });
 
 // --------------------------------------------------
 // FOLLOWUP SCHEMA
 // --------------------------------------------------
 
 const leadFollowUpSchema =
-new mongoose.Schema({
+  new mongoose.Schema({
 
-  // --------------------------------------------------
-  // RELATIONS
-  // --------------------------------------------------
+    // --------------------------------------------------
+    // RELATIONS
+    // --------------------------------------------------
 
-  lead:{
-    type:mongoose.Schema.Types.ObjectId,
-    ref:"Lead",
-    required:true
-  },
+    lead: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Lead",
+      required: true
+    },
 
-  salesPerson:{
-    type:mongoose.Schema.Types.ObjectId,
-    ref:"SalesTeam",
-    required:true
-  },
+    counsellor: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "SalesTeam",
+      required: true
+    },
 
-  createdBy:{
-    type:mongoose.Schema.Types.ObjectId,
-    ref:"SalesTeam",
-    required:true
-  },
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "SalesTeam",
+      required: true
+    },
 
-  // --------------------------------------------------
-  // SCHEDULE
-  // --------------------------------------------------
+    // --------------------------------------------------
+    // SCHEDULE
+    // --------------------------------------------------
 
-  scheduledAt:{
-    type:Date,
-    required:true
-  },
+    scheduledAt: {
+      type: Date,
+      required: true
+    },
 
-  completedAt:Date,
+    completedAt: Date,
 
-  nextFollowupAt:Date,
+    nextFollowupAt: Date,
 
-  // --------------------------------------------------
-  // FOLLOWUP
-  // --------------------------------------------------
+    // --------------------------------------------------
+    // FOLLOWUP
+    // --------------------------------------------------
 
-  type:{
-    type:String,
-    enum:FOLLOWUP_TYPE,
-    required:true
-  },
+    type: {
+      type: String,
+      enum: FOLLOWUP_TYPE,
+      required: true
+    },
 
-  status:{
-    type:String,
-    enum:FOLLOWUP_STATUS,
-    default:"PENDING"
-  },
+    status: {
+      type: String,
+      enum: FOLLOWUP_STATUS,
+      default: "PENDING"
+    },
 
-  customerResponse:{
-    type:String,
-    enum:CUSTOMER_RESPONSE
-  },
+    leadResponse: {
+      type: String,
+      enum: CUSTOMER_RESPONSE
+    },
 
-  updatedLeadStatus:{
-    type:String,
-    enum:LEAD_STATUS
-  },
+    updatedLeadStatus: {
+      type: String,
+      enum: LEAD_STATUS
+    },
 
-  // --------------------------------------------------
-  // DISCUSSION
-  // --------------------------------------------------
+    // --------------------------------------------------
+    // DISCUSSION
+    // --------------------------------------------------
 
-  discussion:{
-    type:String,
-    trim:true
-  },
+    discussion: {
+      type: String,
+      trim: true
+    },
 
-  internalRemarks:{
-    type:String,
-    trim:true
-  },
+    internalRemarks: {
+      type: String,
+      trim: true
+    },
 
-  duration:{
-    type:Number,
-    default:0
-  },
+    duration: {
+      type: Number,
+      default: 0
+    },
 
-  // --------------------------------------------------
-  // ATTACHMENTS
-  // --------------------------------------------------
+    // --------------------------------------------------
+    // ATTACHMENTS
+    // --------------------------------------------------
 
-  attachments:[
-    attachmentSchema
-  ]
+    attachments: [
+      attachmentSchema
+    ]
 
-},{
-  timestamps:true
-});
+  }, {
+    timestamps: true
+  });
 
 // --------------------------------------------------
 // INDEXES
@@ -136,38 +136,38 @@ new mongoose.Schema({
 
 leadFollowUpSchema.index({
 
-  lead:1,
+  lead: 1,
 
-  completedAt:-1
-
-});
-
-leadFollowUpSchema.index({
-
-  salesPerson:1,
-
-  status:1
+  completedAt: -1
 
 });
 
 leadFollowUpSchema.index({
 
-  status:1,
+  salesPerson: 1,
 
-  scheduledAt:1
+  status: 1
 
 });
 
 leadFollowUpSchema.index({
 
-  status:1,
+  status: 1,
 
-  nextFollowupAt:1
+  scheduledAt: 1
+
+});
+
+leadFollowUpSchema.index({
+
+  status: 1,
+
+  nextFollowupAt: 1
 
 });
 
 module.exports =
-mongoose.model(
-"LeadFollowUp",
-leadFollowUpSchema
-);
+  mongoose.model(
+    "LeadFollowUp",
+    leadFollowUpSchema
+  );

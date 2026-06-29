@@ -21,10 +21,29 @@ import { getBatches } from "@/services/admin/batchService";
 import { getCourses } from "@/services/admin/courseService";
 import { createBulkTimetable } from "@/services/admin/timetableService";
 
-const DAYS = ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"];
-const DAY_SHORT = { MONDAY: "Mon", TUESDAY: "Tue", WEDNESDAY: "Wed", THURSDAY: "Thu", FRIDAY: "Fri", SATURDAY: "Sat" };
+const DAYS = [
+  "MONDAY",
+  "TUESDAY",
+  "WEDNESDAY",
+  "THURSDAY",
+  "FRIDAY",
+  "SATURDAY",
+];
+const DAY_SHORT = {
+  MONDAY: "Mon",
+  TUESDAY: "Tue",
+  WEDNESDAY: "Wed",
+  THURSDAY: "Thu",
+  FRIDAY: "Fri",
+  SATURDAY: "Sat",
+};
 
-const EMPTY_SLOT = () => ({ subject: "", startTime: "", endTime: "", roomNumber: "" });
+const EMPTY_SLOT = () => ({
+  subject: "",
+  startTime: "",
+  endTime: "",
+  roomNumber: "",
+});
 
 function timeToMins(t) {
   if (!t) return null;
@@ -62,8 +81,10 @@ function getConflicts(slots) {
       const a = slots[i];
       const b = slots[j];
       if (!a.startTime || !a.endTime || !b.startTime || !b.endTime) continue;
-      const as_ = timeToMins(a.startTime), ae = timeToMins(a.endTime);
-      const bs = timeToMins(b.startTime), be = timeToMins(b.endTime);
+      const as_ = timeToMins(a.startTime),
+        ae = timeToMins(a.endTime);
+      const bs = timeToMins(b.startTime),
+        be = timeToMins(b.endTime);
       if (as_ < be && ae > bs) found.push({ first: i, second: j });
     }
   }
@@ -99,10 +120,13 @@ function PageHeader({ conflicts }) {
           <div className="p-2 rounded-lg bg-primary/10 text-primary">
             <CalendarClock className="w-5 h-5" />
           </div>
-          <h1 className="text-xl font-semibold text-foreground">Bulk Timetable Builder</h1>
+          <h1 className="text-xl font-semibold text-foreground">
+            Bulk Timetable Builder
+          </h1>
         </div>
         <p className="text-sm text-muted-foreground mt-1 ml-[2.75rem]">
-          Schedule multiple slots for a batch, course, and teacher in one submission.
+          Schedule multiple slots for a batch, course, and teacher in one
+          submission.
         </p>
       </div>
       <span
@@ -117,7 +141,9 @@ function PageHeader({ conflicts }) {
         ) : (
           <CheckCircle2 className="w-3.5 h-3.5" />
         )}
-        {hasConflicts ? `${conflicts.length} conflict${conflicts.length !== 1 ? "s" : ""}` : "No conflicts"}
+        {hasConflicts
+          ? `${conflicts.length} conflict${conflicts.length !== 1 ? "s" : ""}`
+          : "No conflicts"}
       </span>
     </div>
   );
@@ -125,7 +151,9 @@ function PageHeader({ conflicts }) {
 
 function SectionCard({ children, className = "" }) {
   return (
-    <div className={`bg-card border border-border rounded-xl shadow-sm ${className}`}>
+    <div
+      className={`bg-card border border-border rounded-xl shadow-sm ${className}`}
+    >
       {children}
     </div>
   );
@@ -142,7 +170,11 @@ function SectionHeader({ icon: Icon, title, description, action }) {
         )}
         <div>
           <h2 className="text-sm font-semibold text-foreground">{title}</h2>
-          {description && <p className="text-xs text-muted-foreground mt-0.5">{description}</p>}
+          {description && (
+            <p className="text-xs text-muted-foreground mt-0.5">
+              {description}
+            </p>
+          )}
         </div>
       </div>
       {action}
@@ -230,7 +262,9 @@ function ConflictAlert({ conflicts }) {
     <div className="mx-5 mb-3 flex items-start gap-2.5 rounded-lg border border-destructive/30 bg-destructive/8 px-4 py-3">
       <AlertTriangle className="w-4 h-4 mt-0.5 text-destructive flex-shrink-0" />
       <div>
-        <p className="text-sm font-medium text-destructive">Time conflicts detected</p>
+        <p className="text-sm font-medium text-destructive">
+          Time conflicts detected
+        </p>
         <p className="text-xs text-destructive/80 mt-0.5">
           Overlapping: {pairs}. Adjust times to continue.
         </p>
@@ -282,11 +316,15 @@ function SlotRow({ slot, index, isConflict, onChange, onRemove, showRemove }) {
             onChange={(e) => onChange(index, "startTime", e.target.value)}
             required
             className={`${inputCls} ${
-              isConflict ? "border-destructive/60 bg-destructive/5 focus:ring-destructive/40" : ""
+              isConflict
+                ? "border-destructive/60 bg-destructive/5 focus:ring-destructive/40"
+                : ""
             }`}
           />
           {duration && (
-            <span className="text-[10px] text-muted-foreground pl-1">{duration}</span>
+            <span className="text-[10px] text-muted-foreground pl-1">
+              {duration}
+            </span>
           )}
         </div>
       </td>
@@ -299,7 +337,9 @@ function SlotRow({ slot, index, isConflict, onChange, onRemove, showRemove }) {
           onChange={(e) => onChange(index, "endTime", e.target.value)}
           required
           className={`${inputCls} ${
-            isConflict ? "border-destructive/60 bg-destructive/5 focus:ring-destructive/40" : ""
+            isConflict
+              ? "border-destructive/60 bg-destructive/5 focus:ring-destructive/40"
+              : ""
           }`}
         />
       </td>
@@ -334,7 +374,7 @@ function SlotRow({ slot, index, isConflict, onChange, onRemove, showRemove }) {
 
 function SlotsTable({ slots, conflicts, onSlotChange, onRemoveSlot }) {
   const conflictIndices = new Set(
-    conflicts.flatMap((c) => [c.first, c.second])
+    conflicts.flatMap((c) => [c.first, c.second]),
   );
 
   return (
@@ -499,7 +539,6 @@ export default function BulkTimetablePage() {
         <PageHeader conflicts={conflicts} />
 
         <form onSubmit={handleSubmit} className="space-y-5" noValidate>
-
           {/* ── Session Context ─────────────────────────────────────── */}
           <SectionCard>
             <SectionHeader
