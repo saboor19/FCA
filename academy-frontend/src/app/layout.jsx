@@ -4,6 +4,7 @@ import { Providers } from "@/components/providers";
 import { AuthProvider } from "@/context/AuthContext";
 import ConditionalFooter from "@/components/public/ConditionalFooter";
 import "leaflet/dist/leaflet.css";
+import { Toaster } from "sonner";
 
 export const metadata = {
     title: "Academy Web App",
@@ -11,31 +12,31 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }) {
-
     return (
-
         <html lang="en" suppressHydrationWarning>
-
             <body>
-
                 <Providers>
-
                     <AuthProvider>
-
                         <NavbarWrapper />
-
                         {children}
-
                         <ConditionalFooter />
-
+                        <Toaster
+                            position="top-right"
+                            richColors
+                            closeButton
+                            toastOptions={{
+                                style: {
+                                    background: "var(--card)",
+                                    color: "var(--foreground)",
+                                    border: "1px solid var(--border)",
+                                    borderRadius: "0",
+                                    fontFamily: "inherit",
+                                },
+                            }}
+                        />
                     </AuthProvider>
-
                 </Providers>
-
             </body>
-
         </html>
-
     );
-
 }
