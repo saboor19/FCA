@@ -11,7 +11,7 @@ exports.createLeadActivitySchema =
     Joi.object({
 
         type: Joi.string()
-            .valid(...ACTIVITY_TYPE)
+            .valid(ACTIVITY_TYPE)
             .required(),
 
         title: Joi.string()
@@ -41,7 +41,7 @@ exports.updateLeadActivitySchema =
     Joi.object({
 
         type: Joi.string()
-            .valid(...ACTIVITY_TYPE),
+            .valid(ACTIVITY_TYPE),
 
         title: Joi.string()
             .trim(),

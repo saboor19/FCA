@@ -48,187 +48,110 @@ const generateLeadNumber = async (session) => {
 // ======================================================
 
 exports.createLead = async (req, res, next) => {
-
-  const session =
-    await mongoose.startSession();
-
+  const session = await mongoose.startSession();
   session.startTransaction();
 
   try {
-
     const {
-
       firstName,
-
       lastName,
-
       primaryPhone,
-
       alternatePhone,
-
       email,
-
       whatsappNumber,
-
       gender,
-
       dateOfBirth,
-
       country,
-
       state,
-
       city,
-
       address,
-
       pincode,
-
       qualification,
-
       institution,
-
       passingYear,
-
       occupation,
-
       experience,
-
       interestedCourse,
-
       preferredBatch,
-
       studyMode,
-
       preferredTiming,
-
       budget,
-
       expectedJoiningDate,
-
       source,
-
       subSource,
-
       campaign,
-
       referredBy,
-
       lostReason,
-
       lostTo,
-
       initialRemarks
-
     } = req.body;
 
     // --------------------------------------------------
     // SALES PERSON
     // --------------------------------------------------
-
-    const salesPerson =
-      await SalesTeam.findOne({
-
-        userId: req.user.id
-
-      }).session(session);
+    const salesPerson = await SalesTeam.findOne({
+      userId: req.user.id
+    }).session(session);
 
     if (!salesPerson) {
-
       await session.abortTransaction();
-
       session.endSession();
-
       return res.status(404).json({
-
         success: false,
-
         message: "Sales team member not found."
-
       });
-
     }
 
     // --------------------------------------------------
     // COURSE VALIDATION
     // --------------------------------------------------
-
     if (interestedCourse) {
-
-      const course =
-        await Course.findById(
-
-          interestedCourse
-
-        ).session(session);
-
+      const course = await Course.findById(interestedCourse).session(session);
       if (!course) {
-
         await session.abortTransaction();
-
         session.endSession();
-
         return res.status(404).json({
-
           success: false,
-
           message: "Course not found."
-
         });
-
       }
-
     }
 
     // --------------------------------------------------
     // BATCH VALIDATION
     // --------------------------------------------------
-
     if (preferredBatch) {
-
-      const batch =
-        await Batch.findById(
-
-          preferredBatch
-
-        ).session(session);
-
+      const batch = await Batch.findById(preferredBatch).session(session);
       if (!batch) {
-
         await session.abortTransaction();
-
         session.endSession();
-
         return res.status(404).json({
-
           success: false,
-
           message: "Batch not found."
-
         });
-
       }
-
     }
 
     // --------------------------------------------------
     // LEAD NUMBER
     // --------------------------------------------------
-
     const leadNumber = await generateLeadNumber(session);
 
     // --------------------------------------------------
     // FULL NAME
     // --------------------------------------------------
-
     const fullName = `${firstName} ${lastName || ""}`.trim();
 
     // --------------------------------------------------
     // CREATE LEAD
     // --------------------------------------------------
-
     const lead = await Lead.create([{
-      leadNumber, firstName, lastName, fullName, primaryPhone, alternatePhone,
+      leadNumber,
+      firstName,
+      lastName,
+      fullName,
+      primaryPhone,
+      alternatePhone,
       email,
       whatsappNumber,
       gender,
@@ -243,8 +166,8 @@ exports.createLead = async (req, res, next) => {
       passingYear,
       occupation,
       experience,
-      interestedCourse,
-      preferredBatch,
+      interestedCourse: interestedCourse || undefined,
+      preferredBatch: preferredBatch || undefined,
       studyMode,
       preferredTiming,
       budget,
@@ -264,112 +187,75 @@ exports.createLead = async (req, res, next) => {
       initialRemarks
     }], { session });
 
-    // --------------------------------------------------
-    // ACTIVITY
-    // --------------------------------------------------
+    const createdLeadId = lead[0]._id;
 
+    // --------------------------------------------------
+    // ACTIVITY 1 — Inside Transaction
+    // --------------------------------------------------
     await LeadActivity.create([{
-
-      lead: lead[0]._id,
-
+      lead: createdLeadId,
       performedBy: salesPerson._id,
-
-      activityType: ACTIVITY_TYPE.CREATED,
-
+      type: ACTIVITY_TYPE.CREATED,
       title: "Lead Created",
-
       description: "Lead created successfully.",
-
       metadata: {
-
         leadNumber,
-
         status: "NEW",
-
         owner: salesPerson._id
-
       }
-
-    }], {
-
-      session
-
-    });
+    }], { session });
 
     // --------------------------------------------------
     // COMMIT
     // --------------------------------------------------
-
     await session.commitTransaction();
-
     session.endSession();
+
+    // --------------------------------------------------
+    // ACTIVITY 2 — After Commit (non-transactional, fire-and-forget safe)
+    // --------------------------------------------------
+    // Use try/catch so failure here doesn't affect the response
+    try {
+      await createLeadActivity({
+        lead: createdLeadId,
+        performedBy: salesPerson._id,
+        type: "CREATED",
+        title: "Lead Created",
+        description: `${fullName} was added as a new lead.`,
+        source: "SYSTEM",
+        metadata: {
+          status: "NEW",
+          priority: "MEDIUM",
+          source: source || "OTHER"
+        }
+      });
+    } catch (activityErr) {
+      // Log but don't fail — lead is already created
+      console.error("Post-commit activity creation failed:", activityErr.message);
+    }
 
     // --------------------------------------------------
     // RESPONSE
     // --------------------------------------------------
-
-    const createdLead = await Lead.findById(lead[0]._id).populate("leadOwner", "employeeId designation")
+    const createdLead = await Lead.findById(createdLeadId)
+      .populate("leadOwner", "employeeId designation")
       .populate("interestedCourse", "title")
       .populate("preferredBatch", "name");
 
-    //------------------------CREATE ACTIVITY ---------
-    await createLeadActivity({
-
-      lead: lead._id,
-
-      performedBy: salesTeam._id,
-
-      type: "CREATED",
-
-      title: "Lead Created",
-
-      description: `${lead.fullName} was added as a new lead.`,
-
-      source: "SYSTEM",
-
-      metadata: {
-
-        status: lead.status,
-
-        priority: lead.priority,
-
-        source: lead.source
-
-      }
-
-    });
-
-
-
-
-
-
     return res.status(201).json({
-
       success: true,
-
       message: "Lead created successfully.",
-
       data: createdLead
-
     });
 
   } catch (error) {
-
     await session.abortTransaction();
-
     session.endSession();
-
     return res.status(500).json({
-
       success: false,
-
       message: error.message
-
     });
-
   }
-
 };
 
 
@@ -951,7 +837,7 @@ exports.updateLead = async (req, res) => {
 
       performedBy: salesPerson._id,
 
-      activityType: ACTIVITY_TYPE.UPDATED,
+      type: ACTIVITY_TYPE.UPDATED,
 
       title: "Lead Updated",
 

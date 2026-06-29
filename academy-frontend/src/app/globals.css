@@ -22,114 +22,135 @@
   --color-sidebar-border: var(--sidebar-border);
 }
 
-/* ──────────────────────────────────────────────
-   CRM Light Theme — Clean, Authoritative, Rigid
-   ────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════
+   DEFAULT THEME  →  SALES_TEAM (rigid, crimson)
+   ═══════════════════════════════════════════════ */
 :root {
-  /* Core surfaces */
   --background: #ffffff;
   --foreground: #0a0a0a;
   --card: #fafafa;
   --border: #d4d4d4;
-
-  /* Primary — Deep Crimson / Red palette for CRM urgency */
-  --primary: #991b1b; /* Red-800 */
-  --primary-hover: #7f1d1d; /* Red-900 */
-  --primary-muted: #fecaca; /* Red-200 */
-
-  /* Secondary — Neutral authority */
-  --secondary: #262626; /* Neutral-800 */
-  --accent: #b91c1c; /* Red-700 */
-
-  /* Supporting tones */
-  --muted: #f5f5f5; /* Neutral-100 */
-  --muted-foreground: #737373; /* Neutral-500 */
-
-  /* Feedback colors */
-  --destructive: #dc2626; /* Red-600 */
-  --destructive-hover: #b91c1c; /* Red-700 */
-  --success: #15803d; /* Green-700 */
-  --warning: #a16207; /* Yellow-700 */
-  --info: #1d4ed8; /* Blue-700 */
-
-  /* Sidebar */
+  --primary: #991b1b;
+  --primary-hover: #7f1d1d;
+  --primary-muted: #fecaca;
+  --secondary: #262626;
+  --accent: #b91c1c;
+  --muted: #f5f5f5;
+  --muted-foreground: #737373;
+  --destructive: #dc2626;
+  --destructive-hover: #b91c1c;
+  --success: #15803d;
+  --warning: #a16207;
+  --info: #1d4ed8;
   --sidebar: #f5f5f5;
   --sidebar-border: #e5e5e5;
 }
 
-/* ──────────────────────────────────────────────
-   CRM Dark Theme — Deep, Functional, Reduced Strain
-   ────────────────────────────────────────────── */
 .dark {
-  /* Core surfaces */
   --background: #0a0a0a;
   --foreground: #fafafa;
   --card: #141414;
   --border: #262626;
-
-  /* Primary — Muted crimson for dark mode readability */
-  --primary: #ef4444; /* Red-500 */
-  --primary-hover: #f87171; /* Red-400 */
-  --primary-muted: #450a0a; /* Red-950 */
-
-  /* Secondary */
-  --secondary: #a3a3a3; /* Neutral-400 */
-  --accent: #ef4444; /* Red-500 */
-
-  /* Supporting tones */
-  --muted: #171717; /* Neutral-900 */
-  --muted-foreground: #a3a3a3; /* Neutral-400 */
-
-  /* Feedback colors */
-  --destructive: #f87171; /* Red-400 */
-  --destructive-hover: #fca5a5; /* Red-300 */
-  --success: #22c55e; /* Green-500 */
-  --warning: #eab308; /* Yellow-500 */
-  --info: #3b82f6; /* Blue-500 */
-
-  /* Sidebar */
+  --primary: #ef4444;
+  --primary-hover: #f87171;
+  --primary-muted: #450a0a;
+  --secondary: #a3a3a3;
+  --accent: #ef4444;
+  --muted: #171717;
+  --muted-foreground: #a3a3a3;
+  --destructive: #f87171;
+  --destructive-hover: #fca5a5;
+  --success: #22c55e;
+  --warning: #eab308;
+  --info: #3b82f6;
   --sidebar: #0f0f0f;
   --sidebar-border: #1f1f1f;
 }
 
-/* ──────────────────────────────────────────────
-   Global Base Styles — Zero Roundness, Rigid UI
-   ────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════
+   ROLE OVERRIDES  (lowercase to match CSS classes)
+   ═══════════════════════════════════════════════ */
+
+/* ── STUDENT ── Friendly, rounded, blue */
+body.role-student {
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+  --primary-muted: #dbeafe;
+  --secondary: #475569;
+  --accent: #3b82f6;
+  --destructive: #dc2626;
+  --destructive-hover: #b91c1c;
+  --success: #16a34a;
+  --warning: #ca8a04;
+  --info: #2563eb;
+}
+
+/* ── TEACHER ── Warm, approachable, amber/teal */
+body.role-teacher {
+  --primary: #0d9488;
+  --primary-hover: #0f766e;
+  --primary-muted: #ccfbf1;
+  --secondary: #57534e;
+  --accent: #14b8a6;
+  --destructive: #ef4444;
+  --destructive-hover: #dc2626;
+  --success: #22c55e;
+  --warning: #eab308;
+  --info: #0ea5e9;
+}
+
+/* ── ADMIN ── Authority, purple */
+body.role-admin {
+  --primary: #7c3aed;
+  --primary-hover: #6d28d9;
+  --primary-muted: #ede9fe;
+  --secondary: #525252;
+  --accent: #8b5cf6;
+  --destructive: #ef4444;
+  --destructive-hover: #dc2626;
+  --success: #22c55e;
+  --warning: #eab308;
+  --info: #6366f1;
+}
+
+/* ── SALES_TEAM ── Explicit (same as default, but ensures override works) */
+body.role-sales_team {
+  /* Inherits :root — no overrides needed */
+}
+
+/* ═══════════════════════════════════════════════
+   BORDER RADIUS STRATEGY
+   ═══════════════════════════════════════════════ */
+
+/* Default + SALES_TEAM + TEACHER + ADMIN: rigid zero radius */
+body:not(.role-student) *,
+body:not(.role-student) *::before,
+body:not(.role-student) *::after {
+  border-radius: 0 !important;
+}
+
+/* STUDENT: allow natural/component-level radius */
+/* (No global override — Tailwind rounded-* works) */
+
+/* ═══════════════════════════════════════════════
+   GLOBAL BASE
+   ═══════════════════════════════════════════════ */
 
 body {
   background: var(--background);
   color: var(--foreground);
-  transition:
-    background 0.15s ease,
-    color 0.15s ease;
-  font-family:
-    ui-sans-serif,
-    system-ui,
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    Roboto,
-    "Helvetica Neue",
-    Arial,
-    sans-serif;
+  transition: background 0.15s ease, color 0.15s ease;
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Remove ALL default border-radius globally */
-*,
-*::before,
-*::after {
-  border-radius: 0 !important;
-}
-
-/* Focus states — visible, square, accessible */
 :focus-visible {
   outline: 2px solid var(--primary);
   outline-offset: 2px;
 }
 
-/* Scrollbar — functional, minimal */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -144,26 +165,21 @@ body {
   background: var(--primary);
 }
 
-/* Selection color */
 ::selection {
   background: var(--primary-muted);
   color: var(--foreground);
 }
 
-/* Links */
 a {
   color: inherit;
   text-decoration: none;
 }
 
-/* Utility: subtle transition for interactive elements */
 button,
 a,
 input,
 select,
 textarea {
-  transition:
-    background-color 0.15s ease,
-    border-color 0.15s ease,
+  transition: background-color 0.15s ease, border-color 0.15s ease,
     color 0.15s ease;
 }

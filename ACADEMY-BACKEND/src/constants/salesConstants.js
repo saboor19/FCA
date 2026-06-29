@@ -224,40 +224,25 @@ const LOST_REASON = [
   "OTHER"
 
 ];
+const ACTIVITY_TYPE = {
+    CREATED: "CREATED",
+    UPDATED: "UPDATED",
+    STATUS_CHANGED: "STATUS_CHANGED",
+    PHONE_CALL: "PHONE_CALL",
+    EMAIL: "EMAIL",
+    WHATSAPP: "WHATSAPP",
+    SMS: "SMS",
+    MEETING: "MEETING",
+    FOLLOW_UP: "FOLLOW_UP",
+    DEMO: "DEMO",
+    NOTE: "NOTE",
+    TASK: "TASK",
+    ASSIGNED: "ASSIGNED",
+    CONVERTED: "CONVERTED",
+    SYSTEM: "SYSTEM"
+};
 
-const ACTIVITY_TYPE = [
-
-   "CREATED",
-
-  "UPDATED",
-
-  "STATUS_CHANGED",
-
-  "PHONE_CALL",
-
-  "EMAIL",
-
-  "WHATSAPP",
-
-  "SMS",
-
-  "MEETING",
-
-  "FOLLOW_UP",
-
-  "DEMO",
-
-  "NOTE",
-
-  "TASK",
-
-  "ASSIGNED",
-
-  "CONVERTED",
-  
-  "SYSTEM"
-
-];
+const ACTIVITY_TYPE_VALUES = Object.values(ACTIVITY_TYPE);
 
 
 
@@ -276,6 +261,8 @@ module.exports = {
   LEAD_SOURCE,
 
   STUDY_MODE,
+
+  ACTIVITY_TYPE_VALUES,
 
   FOLLOWUP_TYPE,
 

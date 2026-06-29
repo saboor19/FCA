@@ -139,9 +139,6 @@ const Navbar = () => {
                   </span>
                 </div>
               </div>
-
-
-``
               <div className="py-2">
                 <button onClick={() => router.push('/teacher/profile')} className="w-full px-6 py-3 text-left hover:bg-accent flex items-center gap-3 text-sm">
                   <UserCircle size={18} /> Profile Settings

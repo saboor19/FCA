@@ -79,7 +79,7 @@ router.put(
 router.post(
     "/:id/activities",
     protect, authorizeRoles("SALES_TEAM", "ADMIN"),
-    validate(createLeadActivitySchema),
+    // validate(createLeadActivitySchema),
     createLeadActivity);
 
 //---------GET ALL ACTIVITIES OF LEAD ----------

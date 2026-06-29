@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const {
-  ACTIVITY_TYPE
+  ACTIVITY_TYPE,ACTIVITY_TYPE_VALUES,
 } = require("../../constants/salesConstants");
 
 const leadActivitySchema =
@@ -33,7 +33,7 @@ new mongoose.Schema({
 
   type:{
     type:String,
-    enum:ACTIVITY_TYPE,
+    enum: ACTIVITY_TYPE_VALUES,
     required:true
   },
 
