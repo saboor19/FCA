@@ -10,265 +10,774 @@ const SalesTeam = require("../../models/sales/SalesTeam");
 
 exports.createSalesTeamMember = async (req, res) => {
 
-const session =
-await mongoose.startSession();
+    const session =
+        await mongoose.startSession();
 
-session.startTransaction();
+    session.startTransaction();
 
-try{
+    try {
 
-const{
+        const {
 
-fullName,
+            fullName,
 
-email,
+            email,
 
-password,
+            password,
 
-employeeId,
+            employeeId,
 
-designation,
+            designation,
 
-department,
+            department,
 
-manager,
+            manager,
 
-phone,
+            phone,
 
-address,
+            address,
 
-gender,
+            gender,
 
-dateOfBirth,
+            dateOfBirth,
 
-joiningDate,
+            joiningDate,
 
-dailyLeadTarget,
+            dailyLeadTarget,
 
-monthlyLeadTarget,
+            monthlyLeadTarget,
 
-employmentStatus,
+            employmentStatus,
 
-bio,
+            bio,
 
-experience
+            experience
 
-}=req.body;
+        } = req.body;
 
-// --------------------------------------------------
-// EMAIL CHECK
-// --------------------------------------------------
+        if (!manager) {
+            req.body.manager = undefined;
+        }
 
-const existingUser =
-await User.findOne({
+        // --------------------------------------------------
+        // EMAIL CHECK
+        // --------------------------------------------------
 
-email:email.toLowerCase()
+        const existingUser =
+            await User.findOne({
 
-}).session(session);
+                email: email.toLowerCase()
 
-if(existingUser){
+            }).session(session);
 
-await session.abortTransaction();
+        if (existingUser) {
 
-session.endSession();
+            await session.abortTransaction();
 
-return res.status(400).json({
+            session.endSession();
 
-success:false,
+            return res.status(400).json({
 
-message:"Email already exists."
+                success: false,
 
-});
+                message: "Email already exists."
 
-}
+            });
 
-// --------------------------------------------------
-// EMPLOYEE ID CHECK
-// --------------------------------------------------
+        }
 
-const existingEmployee =
-await SalesTeam.findOne({
+        // --------------------------------------------------
+        // EMPLOYEE ID CHECK
+        // --------------------------------------------------
 
-employeeId
+        const existingEmployee =
+            await SalesTeam.findOne({
 
-}).session(session);
+                employeeId
 
-if(existingEmployee){
+            }).session(session);
 
-await session.abortTransaction();
+        if (existingEmployee) {
 
-session.endSession();
+            await session.abortTransaction();
 
-return res.status(400).json({
+            session.endSession();
 
-success:false,
+            return res.status(400).json({
 
-message:"Employee ID already exists."
+                success: false,
 
-});
+                message: "Employee ID already exists."
 
-}
+            });
 
-// --------------------------------------------------
-// MANAGER VALIDATION
-// --------------------------------------------------
+        }
 
-if(manager){
+        // --------------------------------------------------
+        // MANAGER VALIDATION
+        // --------------------------------------------------
 
-const managerExists =
-await SalesTeam.findById(manager)
-.session(session);
+        if (manager) {
 
-if(!managerExists){
+            const managerExists =
+                await SalesTeam.findById(manager)
+                    .session(session);
 
-await session.abortTransaction();
+            if (!managerExists) {
 
-session.endSession();
+                await session.abortTransaction();
 
-return res.status(404).json({
+                session.endSession();
 
-success:false,
+                return res.status(404).json({
 
-message:"Manager not found."
+                    success: false,
 
-});
+                    message: "Manager not found."
 
-}
+                });
 
-}
+            }
 
-// --------------------------------------------------
-// PASSWORD
-// --------------------------------------------------
+        }
 
-const hashedPassword =
-await bcrypt.hash(password,10);
+        // --------------------------------------------------
+        // PASSWORD
+        // --------------------------------------------------
 
-// --------------------------------------------------
-// CREATE USER
-// --------------------------------------------------
+        const hashedPassword =
+            await bcrypt.hash(password, 10);
 
-const user =
-await User.create([{
+        // --------------------------------------------------
+        // CREATE USER
+        // --------------------------------------------------
 
-fullName,
+        const user =
+            await User.create([{
 
-email:email.toLowerCase(),
+                fullName,
 
-password:hashedPassword,
+                email: email.toLowerCase(),
 
-role:"SALES_TEAM",
+                password: hashedPassword,
 
-phone
+                role: "SALES_TEAM",
 
-}],{
+                phone
 
-session
+            }], {
 
-});
+                session
 
-// --------------------------------------------------
-// CREATE SALES PROFILE
-// --------------------------------------------------
+            });
 
-const salesTeam =
-await SalesTeam.create([{
+        // --------------------------------------------------
+        // CREATE SALES PROFILE
+        // --------------------------------------------------
 
-userId:user[0]._id,
+        const salesTeam =
+            await SalesTeam.create([{
 
-employeeId,
+                userId: user[0]._id,
 
-designation,
+                employeeId,
 
-department,
+                designation,
 
-manager,
+                department,
 
-phone,
+                manager,
 
-address,
+                phone,
 
-gender,
+                address,
 
-dateOfBirth,
+                gender,
 
-joiningDate,
+                dateOfBirth,
 
-dailyLeadTarget,
+                joiningDate,
 
-monthlyLeadTarget,
+                dailyLeadTarget,
 
-employmentStatus,
+                monthlyLeadTarget,
 
-bio,
+                employmentStatus,
 
-experience
+                bio,
 
-}],{
+                experience
 
-session
+            }], {
 
-});
+                session
 
-// --------------------------------------------------
-// COMMIT
-// --------------------------------------------------
+            });
 
-await session.commitTransaction();
+        // --------------------------------------------------
+        // COMMIT
+        // --------------------------------------------------
 
-session.endSession();
+        await session.commitTransaction();
 
-// --------------------------------------------------
-// RESPONSE
-// --------------------------------------------------
+        session.endSession();
 
-const createdSalesPerson =
-await SalesTeam.findById(
+        // --------------------------------------------------
+        // RESPONSE
+        // --------------------------------------------------
 
-salesTeam[0]._id
+        const createdSalesPerson =
+            await SalesTeam.findById(
 
-)
+                salesTeam[0]._id
 
-.populate(
+            )
 
-"userId",
+                .populate(
 
-"fullName email role isActive"
+                    "userId",
 
-)
+                    "fullName email role isActive"
 
-.populate(
+                )
 
-"manager",
+                .populate(
 
-"employeeId designation"
+                    "manager",
 
-);
+                    "employeeId designation"
 
-return res.status(201).json({
+                );
 
-success:true,
+        return res.status(201).json({
 
-message:"Sales team member created successfully.",
+            success: true,
 
-data:createdSalesPerson
+            message: "Sales team member created successfully.",
 
-});
+            data: createdSalesPerson
 
-}catch(error){
+        });
 
-await session.abortTransaction();
+    } catch (error) {
 
-session.endSession();
+        await session.abortTransaction();
 
-return res.status(500).json({
+        session.endSession();
 
-success:false,
+        return res.status(500).json({
 
-message:error.message
+            success: false,
 
-});
+            message: error.message
 
-}
+        });
+
+    }
+
+};
+// ======================================================
+// GET ALL SALES TEAM MEMBERS
+// ======================================================
+
+exports.getSalesTeamMembers = async (req, res) => {
+
+    try {
+
+        const {
+
+            page = 1,
+
+            limit = 10,
+
+            search = "",
+
+            department,
+
+            designation,
+
+            employmentStatus,
+
+            manager,
+
+            isActive
+
+        } = req.query;
+
+        const filter = {};
+
+        if (department)
+            filter.department = department;
+
+        if (designation)
+            filter.designation = designation;
+
+        if (employmentStatus)
+            filter.employmentStatus = employmentStatus;
+
+        if (manager)
+            filter.manager = manager;
+
+        const userFilter = {};
+
+        if (search) {
+
+            userFilter.$or = [
+
+                {
+                    fullName: {
+                        $regex: search,
+                        $options: "i"
+                    }
+                },
+
+                {
+                    email: {
+                        $regex: search,
+                        $options: "i"
+                    }
+                }
+
+            ];
+
+        }
+
+        if (isActive !== undefined)
+            userFilter.isActive = isActive === "true";
+
+        const users =
+            await User.find(userFilter).select("_id");
+
+        filter.userId = {
+            $in: users.map(user => user._id)
+        };
+
+        const total =
+            await SalesTeam.countDocuments(filter);
+
+        const salesTeam =
+            await SalesTeam.find(filter)
+
+                .populate(
+                    "userId",
+                    "fullName email phone role isActive"
+                )
+
+                .populate(
+                    "manager",
+                    "employeeId designation"
+                )
+
+                .sort({
+                    createdAt: -1
+                })
+
+                .skip((page - 1) * limit)
+
+                .limit(Number(limit));
+
+        return res.status(200).json({
+
+            success: true,
+
+            data: salesTeam,
+
+            pagination: {
+
+                total,
+
+                page: Number(page),
+
+                pages: Math.ceil(total / limit),
+
+                limit: Number(limit)
+
+            }
+
+        });
+
+    } catch (error) {
+
+        return res.status(500).json({
+
+            success: false,
+
+            message: error.message
+
+        });
+
+    }
+
+};
+
+// ======================================================
+// GET SINGLE SALES TEAM MEMBER
+// ======================================================
+
+exports.getSalesTeamMember = async (req, res) => {
+
+    try {
+
+        const salesPerson =
+            await SalesTeam.findById(req.params.id)
+
+                .populate(
+                    "userId",
+                    "-password"
+                )
+
+                .populate(
+                    "manager",
+                    "employeeId designation userId"
+                );
+
+        if (!salesPerson) {
+
+            return res.status(404).json({
+
+                success: false,
+
+                message: "Sales team member not found."
+
+            });
+
+        }
+
+        return res.status(200).json({
+
+            success: true,
+
+            data: salesPerson
+
+        });
+
+    } catch (error) {
+
+        return res.status(500).json({
+
+            success: false,
+
+            message: error.message
+
+        });
+
+    }
+
+};
+
+
+// ======================================================
+// UPDATE SALES TEAM MEMBER
+// ======================================================
+
+exports.updateSalesTeamMember = async (req, res) => {
+
+    const session =
+        await mongoose.startSession();
+
+    session.startTransaction();
+
+    try {
+
+        const salesPerson =
+            await SalesTeam.findById(req.params.id)
+                .session(session);
+
+        if (!salesPerson) {
+
+            await session.abortTransaction();
+
+            session.endSession();
+
+            return res.status(404).json({
+
+                success: false,
+
+                message: "Sales team member not found."
+
+            });
+
+        }
+
+        const user =
+            await User.findById(
+                salesPerson.userId
+            ).session(session);
+
+        if (req.body.email) {
+
+            const exists =
+                await User.findOne({
+
+                    email: req.body.email.toLowerCase(),
+
+                    _id: {
+                        $ne: user._id
+                    }
+
+                }).session(session);
+
+            if (exists) {
+
+                await session.abortTransaction();
+
+                session.endSession();
+
+                return res.status(400).json({
+
+                    success: false,
+
+                    message: "Email already exists."
+
+                });
+
+            }
+
+            user.email =
+                req.body.email.toLowerCase();
+
+        }
+
+        if (req.body.fullName)
+            user.fullName = req.body.fullName;
+
+        if (req.body.phone !== undefined)
+            user.phone = req.body.phone;
+
+        await user.save({ session });
+
+        const fields = [
+
+            "employeeId",
+
+            "designation",
+
+            "department",
+
+            "manager",
+
+            "phone",
+
+            "address",
+
+            "gender",
+
+            "dateOfBirth",
+
+            "joiningDate",
+
+            "dailyLeadTarget",
+
+            "monthlyLeadTarget",
+
+            "employmentStatus",
+
+            "bio",
+
+            "experience"
+
+        ];
+
+        fields.forEach(field => {
+
+            if (req.body[field] !== undefined) {
+
+                salesPerson[field] =
+                    req.body[field];
+
+            }
+
+        });
+
+        await salesPerson.save({
+
+            session
+
+        });
+
+        await session.commitTransaction();
+
+        session.endSession();
+
+        const updated =
+            await SalesTeam.findById(
+                salesPerson._id
+            )
+
+                .populate(
+                    "userId",
+                    "-password"
+                )
+
+                .populate(
+                    "manager",
+                    "employeeId designation"
+                );
+
+        return res.status(200).json({
+
+            success: true,
+
+            message: "Sales team member updated successfully.",
+
+            data: updated
+
+        });
+
+    } catch (error) {
+
+        await session.abortTransaction();
+
+        session.endSession();
+
+        return res.status(500).json({
+
+            success: false,
+
+            message: error.message
+
+        });
+
+    }
+
+};
+
+
+// ======================================================
+// DELETE SALES TEAM MEMBER
+// ======================================================
+
+exports.deleteSalesTeamMember = async (req, res) => {
+
+    const session =
+        await mongoose.startSession();
+
+    session.startTransaction();
+
+    try {
+
+        const salesPerson =
+            await SalesTeam.findById(req.params.id)
+                .session(session);
+
+        if (!salesPerson) {
+
+            await session.abortTransaction();
+
+            session.endSession();
+
+            return res.status(404).json({
+
+                success: false,
+
+                message: "Sales team member not found."
+
+            });
+
+        }
+
+        await User.findByIdAndDelete(
+
+            salesPerson.userId,
+
+            { session }
+
+        );
+
+        await SalesTeam.findByIdAndDelete(
+
+            salesPerson._id,
+
+            { session }
+
+        );
+
+        await session.commitTransaction();
+
+        session.endSession();
+
+        return res.status(200).json({
+
+            success: true,
+
+            message: "Sales team member deleted successfully."
+
+        });
+
+    } catch (error) {
+
+        await session.abortTransaction();
+
+        session.endSession();
+
+        return res.status(500).json({
+
+            success: false,
+
+            message: error.message
+
+        });
+
+    }
+
+};
+
+// ======================================================
+// TOGGLE SALES TEAM STATUS
+// ======================================================
+
+exports.toggleSalesTeamStatus = async (req, res) => {
+
+    try {
+
+        const salesPerson =
+            await SalesTeam.findById(req.params.id);
+
+        if (!salesPerson) {
+
+            return res.status(404).json({
+
+                success: false,
+
+                message: "Sales team member not found."
+
+            });
+
+        }
+
+        const user =
+            await User.findById(
+                salesPerson.userId
+            );
+
+        user.isActive = !user.isActive;
+
+        await user.save();
+
+        return res.status(200).json({
+
+            success: true,
+
+            message: `Sales team member ${user.isActive ? "activated" : "deactivated"} successfully.`,
+
+            data: {
+
+                isActive: user.isActive
+
+            }
+
+        });
+
+    } catch (error) {
+
+        return res.status(500).json({
+
+            success: false,
+
+            message: error.message
+
+        });
+
+    }
 
 };

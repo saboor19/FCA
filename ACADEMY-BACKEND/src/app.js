@@ -85,7 +85,7 @@ app.use("/api/admin/attendance", attendanceRoutes);
 app.use("/api/teachers/", adminTeacherRoutes)
 app.use("/api/admin/notices", require("./routes/admin/noticeRoutes"));
 app.use("/api/admin/timetables", require("./routes/admin/timetableRoutes"));
-app.use("/api/admin/sales", require("./routes/admin/salesTeamRoutes"));
+app.use("/api/admin/sales-team", require("./routes/admin/salesTeamRoutes"));
 
 
 app.use("/api/admin/fees", feeRoutes);

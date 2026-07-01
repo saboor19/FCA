@@ -85,6 +85,55 @@ export const TASK_PRIORITY = [
 
 ];
 
+// --------------------------------------------
+// GENDER
+// --------------------------------------------
+
+export const SALES_TEAM_GENDER = [
+  "MALE",
+  "FEMALE",
+  "OTHER",
+];
+
+// --------------------------------------------
+// EMPLOYMENT STATUS
+// --------------------------------------------
+
+export const SALES_TEAM_EMPLOYMENT_STATUS = [
+  "ACTIVE",
+  "INACTIVE",
+  "ON_LEAVE",
+  "RESIGNED",
+  "TERMINATED",
+];
+
+// --------------------------------------------
+// DEFAULT DESIGNATIONS
+// --------------------------------------------
+
+export const SALES_TEAM_DESIGNATIONS = [
+  "Sales Executive",
+  "Senior Sales Executive",
+  "Sales Associate",
+  "Business Development Executive",
+  "Business Development Manager",
+  "Sales Manager",
+  "Regional Sales Manager",
+  "Team Lead",
+  "Counsellor",
+];
+
+// --------------------------------------------
+// DEPARTMENTS
+// --------------------------------------------
+
+export const SALES_TEAM_DEPARTMENTS = [
+  "Sales",
+  "Admissions",
+  "Business Development",
+  "Marketing",
+];
+
 export const ACTIVITY_TYPE_VALUES = Object.values(ACTIVITY_TYPE);
 
 

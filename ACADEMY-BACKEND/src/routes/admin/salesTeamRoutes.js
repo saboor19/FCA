@@ -8,17 +8,48 @@ const {
 } = require("../../middlewares/authMiddleware");
 
 const {
-createSalesTeamMember
+
+  createSalesTeamMember,
+
+  getSalesTeamMembers,
+
+  getSalesTeamMember,
+
+  updateSalesTeamMember,
+
+  deleteSalesTeamMember,
+
+  toggleSalesTeamStatus
+
 } = require("../../controllers/admin/salesteamController");
+
+// ======================================================
+// MIDDLEWARE
+// ======================================================
 
 router.use(
   protect,
   authorizeRoles("ADMIN")
 );
 
+// ======================================================
+// SALES TEAM
+// ======================================================
 
-router.post("/", createSalesTeamMember);
+router
+  .route("/")
+  .post(createSalesTeamMember)
+  .get(getSalesTeamMembers);
 
+router
+  .route("/:id")
+  .get(getSalesTeamMember)
+  .put(updateSalesTeamMember)
+  .delete(deleteSalesTeamMember);
 
+router.patch(
+  "/:id/toggle-status",
+  toggleSalesTeamStatus
+);
 
 module.exports = router;
