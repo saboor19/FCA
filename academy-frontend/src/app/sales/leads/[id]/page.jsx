@@ -11,7 +11,8 @@ import {
   GraduationCap,
   Briefcase,
   DollarSign,
-  User,ChevronRight ,
+  User,
+  ChevronRight,
   Clock,
   Tag,
   Flag,
@@ -33,7 +34,7 @@ import {
   Save,
   Star,
 } from "lucide-react";
-
+import LeadTasks from "@/components/sales/tasks/LeadTasks";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -74,7 +75,8 @@ import {
   LEAD_SOURCE,
   GENDER,
   STUDY_MODE,
-  TIMING,ACTIVITY_TYPE_VALUES
+  TIMING,
+  ACTIVITY_TYPE_VALUES,
 } from "@/constants/salesConstants";
 
 import {
@@ -477,6 +479,12 @@ export default function LeadDetailPage() {
                   Overview
                 </TabsTrigger>
                 <TabsTrigger
+                  value="tasks"
+                  className="text-xs data-[state=active]:bg-[var(--background)] data-[state=active]:text-[var(--primary)] data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-[var(--primary)]"
+                >
+                  Tasks
+                </TabsTrigger>
+                <TabsTrigger
                   value="activities"
                   className="text-xs data-[state=active]:bg-[var(--background)] data-[state=active]:text-[var(--primary)] data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-[var(--primary)]"
                 >
@@ -740,11 +748,15 @@ export default function LeadDetailPage() {
                             <SelectTrigger className="bg-[var(--background)] border-[var(--border)] h-9 text-xs">
                               <SelectValue />
                             </SelectTrigger>
-<SelectContent className="bg-[var(--card)] border-[var(--border)]">
-                  {ACTIVITY_TYPE_VALUES.map((s) => (
-                    <SelectItem key={s} value={s} className="text-xs">
-                      {s.replace(/_/g, " ")}
-                    </SelectItem>
+                            <SelectContent className="bg-[var(--card)] border-[var(--border)]">
+                              {ACTIVITY_TYPE_VALUES.map((s) => (
+                                <SelectItem
+                                  key={s}
+                                  value={s}
+                                  className="text-xs"
+                                >
+                                  {s.replace(/_/g, " ")}
+                                </SelectItem>
                               ))}
                             </SelectContent>
                           </Select>
@@ -903,6 +915,9 @@ export default function LeadDetailPage() {
                     })
                   )}
                 </div>
+              </TabsContent>
+              <TabsContent value="tasks" className="mt-6">
+                <LeadTasks leadId={lead._id} />
               </TabsContent>
 
               {/* ── COURSE TAB ── */}

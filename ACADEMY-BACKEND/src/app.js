@@ -19,7 +19,7 @@ const adminTeacherRoutes = require("./routes/admin/teacherRoutes")
 const noticeRoutes = require("./routes/admin/noticeRoutes")
 const teacherRoutes = require("./routes/teacher/batchRoutes")
 const feeRoutes = require("./routes/admin/feeRoutes");
-const financeRoutes=require("./routes/admin/financeRoutes")
+const financeRoutes = require("./routes/admin/financeRoutes")
 
 
 
@@ -33,15 +33,15 @@ const errorHandler = require("./middlewares/errorMiddleware");
 
 const app = express();
 
-console.log("frontend url : ",process.env.FRONTEND_URL);
+console.log("frontend url : ", process.env.FRONTEND_URL);
 app.use(helmet());
 app.use(
   cors({
-    origin:[
+    origin: [
       process.env.FRONTEND_URL,
       "http://localhost:3000"
     ],
-    credentials:true
+    credentials: true
   })
 );
 app.use(morgan("dev"));
@@ -62,7 +62,7 @@ app.use(limiter);
 
 
 //-----------------HOME---------------
-app.get("/", (req, res) => {res.json({message: "Academy API Running" });});
+app.get("/", (req, res) => { res.json({ message: "Academy API Running" }); });
 
 //-------------AUTH ROUTES---------------
 app.use("/api/auth", authRoutes);
@@ -70,46 +70,46 @@ app.use("/api/auth", authRoutes);
 
 //---------------public routes----------------
 app.use("/api/courses", publicCourseRoutes);
-app.use("/api/public/enrollment",require("./routes/public/enrollementRoutes"));
+app.use("/api/public/enrollment", require("./routes/public/enrollementRoutes"));
 
 //--------------SALES--------------
-app.use("/api/sales/leads",require("./routes/salesteam/leadRoutes"));
-
+app.use("/api/sales/leads", require("./routes/salesteam/leadRoutes"));
+app.use("/api/sales/team",require("./routes/salesteam/salesTeamRoutes"));
 
 //---------------- admin routes
 app.use("/api/admin/courses", courseRoutes);
-app.use( "/api/admin/students", studentRoutes );
-app.use( "/api/batches",batchRoutes );
-app.use("/api/enrollments",enrollmentRoutes);
-app.use( "/api/admin/attendance", attendanceRoutes);
-app.use("/api/teachers/",adminTeacherRoutes)
-app.use( "/api/admin/notices", require("./routes/admin/noticeRoutes") );
-app.use( "/api/admin/timetables", require("./routes/admin/timetableRoutes"));
-app.use( "/api/admin/sales", require("./routes/admin/salesTeamRoutes"));
+app.use("/api/admin/students", studentRoutes);
+app.use("/api/batches", batchRoutes);
+app.use("/api/enrollments", enrollmentRoutes);
+app.use("/api/admin/attendance", attendanceRoutes);
+app.use("/api/teachers/", adminTeacherRoutes)
+app.use("/api/admin/notices", require("./routes/admin/noticeRoutes"));
+app.use("/api/admin/timetables", require("./routes/admin/timetableRoutes"));
+app.use("/api/admin/sales", require("./routes/admin/salesTeamRoutes"));
 
 
-app.use( "/api/admin/fees", feeRoutes );
-app.use("/api/admin/finance",financeRoutes);
-app.use("/api/admin/admissions",require("./routes/admin/admissionRoutes"));
+app.use("/api/admin/fees", feeRoutes);
+app.use("/api/admin/finance", financeRoutes);
+app.use("/api/admin/admissions", require("./routes/admin/admissionRoutes"));
 //----------------TEACHER ROUTES------------
-app.use( "/api/teacher/batches", require("./routes/teacher/batchRoutes"));
-app.use( "/api/teacher/timetable", require("./routes/teacher/timetableRoutes"));
-app.use( "/api/teacher/attendance", require("./routes/teacher/attendanceRoutes"));
-app.use( "/api/teacher/students", require("./routes/teacher/studentRoutes"));
-app.use( "/api/teacher/notices", require("./routes/teacher/noticeRoutes") );
-app.use( "/api/teacher/profile", require("./routes/teacher/profileRoutes") );
-app.use("/api/teacher/assignments",require("./routes/teacher/assignmentRoutes") );
+app.use("/api/teacher/batches", require("./routes/teacher/batchRoutes"));
+app.use("/api/teacher/timetable", require("./routes/teacher/timetableRoutes"));
+app.use("/api/teacher/attendance", require("./routes/teacher/attendanceRoutes"));
+app.use("/api/teacher/students", require("./routes/teacher/studentRoutes"));
+app.use("/api/teacher/notices", require("./routes/teacher/noticeRoutes"));
+app.use("/api/teacher/profile", require("./routes/teacher/profileRoutes"));
+app.use("/api/teacher/assignments", require("./routes/teacher/assignmentRoutes"));
 app.use("/api/teacher/study-materials", require("./routes/teacher/studyMaterialRoutes"));
 //----------------STUDENT ROUTES----------------
 
 app.use("/api/student/assignments", require("./routes/student/assignmentRoutes"));
-app.use("/api/student/attendance",require("./routes/student/attendanceRoutes"))
-app.use("/api/student/notices/",require("./routes/student/noticeRoutes"));
+app.use("/api/student/attendance", require("./routes/student/attendanceRoutes"))
+app.use("/api/student/notices/", require("./routes/student/noticeRoutes"));
 app.use("/api/student/assignments", require("./routes/student/assignmentRoutes"));
-app.use("/api/student/batches",  require("./routes/student/batchRoutes"));
-app.use("/api/student/timetable",require("./routes/student/timetableRoutes"));
-app.use("/api/student/fees",require("./routes/student/feeRoutes"));
-app.use("/api/student/profile",require("./routes/student/profileRoutes"));
+app.use("/api/student/batches", require("./routes/student/batchRoutes"));
+app.use("/api/student/timetable", require("./routes/student/timetableRoutes"));
+app.use("/api/student/fees", require("./routes/student/feeRoutes"));
+app.use("/api/student/profile", require("./routes/student/profileRoutes"));
 app.use("/api/student/study-materials", require("./routes/student/studyMaterialRoutes"));
 //----------------image upload routes----------------
 app.use("/api/uploads", require("./routes/uploadRoutes"));

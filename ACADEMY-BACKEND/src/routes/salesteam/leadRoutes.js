@@ -17,7 +17,9 @@ const validate = require("../../middlewares/validateMiddleware");
 //------------VALIDATIONS---------
 const {
     createLeadActivitySchema,
-    updateLeadActivitySchema
+    updateLeadActivitySchema,
+    createLeadTaskSchema,
+    updateLeadTaskSchema
 } = require("../../validations/sales/leadValidation");
 
 
@@ -32,7 +34,13 @@ const {
     updateLeadActivity,
     deleteLeadActivity,
     deleteLead,
-    convertLead
+    convertLead,
+        // TASKS
+    createLeadTask,
+    getLeadTasks,
+    getLeadTask,
+    updateLeadTask,
+    deleteLeadTask
 } = require("../../controllers/sales/leadController");
 
 // ======================================================
@@ -125,6 +133,53 @@ router.delete(
 
     deleteLeadActivity
 
+);
+
+
+// ======================================================
+// LEAD TASKS
+// ======================================================
+
+// Create Task
+router.post(
+    "/:id/tasks",
+    protect,
+    authorizeRoles("SALES_TEAM", "ADMIN"),
+    validate(createLeadTaskSchema),
+    createLeadTask
+);
+
+// Get All Tasks of Lead
+router.get(
+    "/:id/tasks",
+    protect,
+    authorizeRoles("SALES_TEAM", "ADMIN"),
+    getLeadTasks
+);
+
+// Get Single Task
+router.get(
+    "/tasks/:taskId",
+    protect,
+    authorizeRoles("SALES_TEAM", "ADMIN"),
+    getLeadTask
+);
+
+// Update Task
+router.put(
+    "/tasks/:taskId",
+    protect,
+    authorizeRoles("SALES_TEAM", "ADMIN"),
+    validate(updateLeadTaskSchema),
+    updateLeadTask
+);
+
+// Delete Task
+router.delete(
+    "/tasks/:taskId",
+    protect,
+    authorizeRoles("SALES_TEAM", "ADMIN"),
+    deleteLeadTask
 );
 
 module.exports = router;

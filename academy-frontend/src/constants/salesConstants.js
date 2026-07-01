@@ -55,6 +55,36 @@ export const TIMING=["MORNING","EVENING", "WEEKEND", "FULL DAY" , "PRE SCHEDULED
     SYSTEM: "SYSTEM"
 };
 
+// ======================================================
+// TASKS
+// ======================================================
+
+export const TASK_STATUS = [
+
+    "PENDING",
+
+    "IN_PROGRESS",
+
+    "COMPLETED",
+
+    "OVERDUE",
+
+    "CANCELLED"
+
+];
+
+export const TASK_PRIORITY = [
+
+    "LOW",
+
+    "MEDIUM",
+
+    "HIGH",
+
+    "URGENT"
+
+];
+
 export const ACTIVITY_TYPE_VALUES = Object.values(ACTIVITY_TYPE);
 
 

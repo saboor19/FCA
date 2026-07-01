@@ -4,6 +4,7 @@ const Lead = require("../../models/sales/Lead");
 const SalesTeam = require("../../models/sales/SalesTeam");
 const LeadActivity = require("../../models/sales/LeadActivity");
 const User = require("../../models/User");
+const LeadTask = require("../../models/sales/LeadTask");
 const Course = require("../../models/Course");
 const Batch = require("../../models/Batch");
 const Counter = require("../../models/Counter");
@@ -1648,4 +1649,221 @@ exports.deleteLeadActivity = async (req, res, next) => {
 
   }
 
+};
+
+
+exports.createLeadTask = async (req, res, next) => {
+  try {
+
+    const lead = await Lead.findById(req.params.id);
+
+    if (!lead) {
+      return res.status(404).json({
+        success: false,
+        message: "Lead not found"
+      });
+    }
+
+    const task = await LeadTask.create({
+      ...req.body,
+      lead: lead._id,
+      createdBy: req.user._id
+    });
+
+    await task.populate([
+      {
+        path: "assignedTo",
+        select: "firstName lastName employeeId"
+      },
+      {
+        path: "createdBy",
+        select: "firstName lastName employeeId"
+      }
+    ]);
+
+    res.status(201).json({
+      success: true,
+      message: "Task created successfully",
+      task
+    });
+
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.getLeadTasks = async (req, res, next) => {
+    try {
+
+        const {
+            status,
+            priority,
+            assignedTo,
+            search
+        } = req.query;
+
+        const filter = {
+            lead: req.params.id
+        };
+
+        if (status) filter.status = status;
+        if (priority) filter.priority = priority;
+        if (assignedTo) filter.assignedTo = assignedTo;
+
+        if (search) {
+
+            filter.$or = [
+                {
+                    title: {
+                        $regex: search,
+                        $options: "i"
+                    }
+                },
+                {
+                    description: {
+                        $regex: search,
+                        $options: "i"
+                    }
+                }
+            ];
+
+        }
+
+        const tasks = await LeadTask.find(filter)
+
+            .populate({
+                path: "assignedTo",
+                select: "employeeId userId",
+                populate: {
+                    path: "userId",
+                    select: "fullName"
+                }
+            })
+
+            .populate({
+                path: "createdBy",
+                select: "employeeId userId",
+                populate: {
+                    path: "userId",
+                    select: "fullName"
+                }
+            })
+
+            .sort({
+                dueDate: 1,
+                createdAt: -1
+            });
+
+        res.status(200).json({
+            success: true,
+            count: tasks.length,
+            tasks
+        });
+
+    } catch (error) {
+
+        next(error);
+
+    }
+};
+
+exports.getLeadTask = async (req, res, next) => {
+  try {
+
+    const task = await LeadTask.findById(req.params.taskId)
+      .populate("lead")
+      .populate("assignedTo", "firstName lastName employeeId")
+      .populate("createdBy", "firstName lastName employeeId");
+
+    if (!task) {
+      return res.status(404).json({
+        success: false,
+        message: "Task not found"
+      });
+    }
+
+    res.json({
+      success: true,
+      task
+    });
+
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.updateLeadTask = async (req, res, next) => {
+  try {
+
+    const task = await LeadTask.findById(req.params.taskId);
+
+    if (!task) {
+      return res.status(404).json({
+        success: false,
+        message: "Task not found"
+      });
+    }
+
+    Object.assign(task, req.body);
+
+    if (
+      req.body.status === "COMPLETED" &&
+      !task.completedAt
+    ) {
+      task.completedAt = new Date();
+    }
+
+    if (
+      req.body.status &&
+      req.body.status !== "COMPLETED"
+    ) {
+      task.completedAt = null;
+    }
+
+    await task.save();
+
+    await task.populate([
+      {
+        path: "assignedTo",
+        select: "firstName lastName employeeId"
+      },
+      {
+        path: "createdBy",
+        select: "firstName lastName employeeId"
+      }
+    ]);
+
+    res.json({
+      success: true,
+      message: "Task updated successfully",
+      task
+    });
+
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.deleteLeadTask = async (req, res, next) => {
+  try {
+
+    const task = await LeadTask.findById(req.params.taskId);
+
+    if (!task) {
+      return res.status(404).json({
+        success: false,
+        message: "Task not found"
+      });
+    }
+
+    await task.deleteOne();
+
+    res.json({
+      success: true,
+      message: "Task deleted successfully"
+    });
+
+  } catch (error) {
+    next(error);
+  }
 };

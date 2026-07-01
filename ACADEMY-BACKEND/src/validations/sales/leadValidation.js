@@ -4,7 +4,9 @@ const {
     ACTIVITY_TYPE,
     LEAD_STATUS,
     LEAD_PRIORITY,
-    LEAD_SOURCE
+    LEAD_SOURCE,
+    TASK_STATUS,
+    TASK_PRIORITY
 } = require("../../constants/salesConstants");
 
 exports.createLeadActivitySchema =
@@ -61,3 +63,51 @@ exports.updateLeadActivitySchema =
         isVisible: Joi.boolean()
 
     }).min(1);
+
+exports.createLeadTaskSchema = Joi.object({
+
+    title: Joi.string()
+        .trim()
+        .required(),
+
+    description: Joi.string()
+        .allow("")
+        .default(""),
+
+    priority: Joi.string()
+        .valid(...TASK_PRIORITY)
+        .default("MEDIUM"),
+
+    assignedTo: Joi.string()
+        .required(),
+
+    dueDate: Joi.date()
+        .required(),
+
+    remarks: Joi.string()
+        .allow("")
+});
+
+exports.updateLeadTaskSchema = Joi.object({
+
+    title: Joi.string()
+        .trim(),
+
+    description: Joi.string()
+        .allow(""),
+
+    priority: Joi.string()
+        .valid(...TASK_PRIORITY),
+
+    status: Joi.string()
+        .valid(...TASK_STATUS),
+
+    assignedTo: Joi.string(),
+
+    dueDate: Joi.date(),
+
+    completedAt: Joi.date(),
+
+    remarks: Joi.string()
+        .allow("")
+});
